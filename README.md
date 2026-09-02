@@ -23,21 +23,49 @@ server when a tool is called, so the plugin never carries a stale copy.
 
 ```
 /plugin marketplace add deriv-com/deriv-api-plugin
+/plugin install deriv-api@deriv-api-marketplace
 ```
 
-This installs the plugin from its public repository.
+The first command registers the public repository as a plugin marketplace; the
+second installs the plugin from it. The plugin declares a remote MCP server, so
+nothing runs on your machine: no local server, and no Node or Python to install.
+Claude Code connects to the plugin's server without a separate approval prompt.
 
 ### Cursor
 
 Cursor's marketplace/URL import is available to **Teams and Enterprise** only;
 individual users cannot add this plugin by URL. Until the plugin is listed,
-install it by cloning or copying it into your Cursor local plugins directory:
+install it by cloning it into your Cursor local plugins directory:
 
 ```
-~/.cursor/plugins/local/
+git clone https://github.com/deriv-com/deriv-api-plugin ~/.cursor/plugins/local/deriv-api
 ```
 
-Place the plugin folder there and reload the Cursor window so it is picked up.
+Then reload the Cursor window so the plugin is picked up.
+
+### Upgrading from version 1
+
+Version 1 shipped a local MCP server and skills under the same plugin name. If
+it is still installed, the new plugin is **not loaded and no error is shown**.
+Remove version 1 first.
+
+Claude Code:
+
+```
+/plugin uninstall deriv-api@deriv-api-marketplace
+/plugin marketplace remove deriv-api-marketplace
+```
+
+then run the two install commands above. Cursor: delete the old `deriv-api`
+folder from `~/.cursor/plugins/local/`, clone the new one as above, and reload
+the window.
+
+### Verify it works
+
+In Claude Code, run `/mcp` and confirm `deriv-api` shows as connected with
+twelve tools. In Cursor, open the MCP settings and confirm the same. If the
+server shows as disconnected, the hosted endpoint is unreachable from your
+network; the plugin has no offline fallback by design.
 
 ## Usage
 
