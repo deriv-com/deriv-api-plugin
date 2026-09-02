@@ -12,11 +12,10 @@ declaration, and the Cursor rule file. There is **no local MCP server and no
 bundled copy of the API surface** — schemas and docs are read live by the hosted
 server when a tool is called, so the plugin never carries a stale copy.
 
-> **Not yet usable.** The remote MCP URL in `.mcp.json` is still a
-> **placeholder**. Until the hosted server is deployed and the real URL replaces
-> the placeholder (tracked in the hosted-MCP migration), the plugin installs and
-> both hosts discover the remote entry, but tool calls will not reach a live
-> server. This README will drop this note when the real URL lands.
+> **Staging endpoint.** The plugin currently connects to the **staging**
+> deployment of the hosted Deriv API MCP server, declared in `.mcp.json`. Staging
+> tracks the server's main branch and may change without notice; a later plugin
+> release will point at the production endpoint.
 
 ## Install
 

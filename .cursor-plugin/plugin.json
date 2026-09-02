@@ -1,7 +1,7 @@
 {
   "name": "deriv-api",
   "displayName": "Deriv API",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Query Deriv's trading API schemas live and follow task-based guides for auth, subscriptions, trading, and error handling.",
   "author": { "name": "Deriv" },
   "homepage": "https://developers.deriv.com",
