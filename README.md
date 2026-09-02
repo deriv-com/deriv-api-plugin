@@ -7,7 +7,7 @@ it. The hosted server exposes the tools that search endpoints; read the current
 request/response schemas, fields, and worked examples; validate payloads; and
 serve task-based guidance for auth, subscriptions, trading, and error handling.
 
-Nothing ships locally except the plugin manifests, the single remote MCP
+The plugin itself contains only the plugin manifests, the single remote MCP
 declaration, and the Cursor rule file. There is **no local MCP server and no
 bundled copy of the API surface** — schemas and docs are read live by the hosted
 server when a tool is called, so the plugin never carries a stale copy.
@@ -32,8 +32,7 @@ This installs the plugin from its public repository.
 
 Cursor's marketplace/URL import is available to **Teams and Enterprise** only;
 individual users cannot add this plugin by URL. Until the plugin is listed,
-install it locally by cloning or copying it into your Cursor local plugins
-directory:
+install it by cloning or copying it into your Cursor local plugins directory:
 
 ```
 ~/.cursor/plugins/local/
