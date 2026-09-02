@@ -10,7 +10,7 @@
     {
       "name": "deriv-api",
       "source": "./",
-      "displayName": "Deriv API",
+      "displayName": "Deriv API (Beta)",
       "description": "Query Deriv's trading API schemas live and follow task-based guides for auth, subscriptions, trading, and error handling.",
       "category": "payments",
       "tags": ["trading", "fintech", "api", "websocket"],

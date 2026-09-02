@@ -1,4 +1,4 @@
-# Deriv API plugin
+# Deriv API plugin (Beta)
 
 A plugin that gives an AI coding agent first-class knowledge of the Deriv API.
 It is a **thin client**: it points both **Cursor** and **Claude Code** at a
