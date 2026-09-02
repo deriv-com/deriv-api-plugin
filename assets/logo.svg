@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="Deriv API plugin placeholder logo">
+  <rect width="128" height="128" rx="24" fill="#0E0E0E"/>
+  <circle cx="64" cy="64" r="40" fill="none" stroke="#FF444F" stroke-width="8"/>
+  <path d="M 64 34 L 64 94 M 34 64 L 94 64" stroke="#FF444F" stroke-width="8" stroke-linecap="round"/>
+</svg>

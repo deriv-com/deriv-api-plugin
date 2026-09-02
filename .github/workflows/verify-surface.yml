@@ -1,0 +1,43 @@
+# verify-surface.yml — PUBLIC-repo surface guard (deriv-com/deriv-api-plugin).
+#
+# Staged into the public repo by the private repo's promotion bundle build
+# (the source repository's promotion tooling lays in this repo's own .github/).
+# It is the INDEPENDENT public-side re-validation the promotion contract requires
+# (the promotion policy): a future promotion cannot silently widen the
+# surface even if the source-side build were bypassed, because this runs on the
+# receiving side over the committed tree.
+#
+# The private build script is NOT promoted, so this check is deliberately
+# self-contained — it inlines the same allowlist and content-gate patterns. Keep
+# it in step with the source repository's promotion tooling when either changes.
+#
+# Two checks, both FAIL CLOSED:
+#   1. Every tracked path is an allowlisted runtime path OR under this repo's own
+#      .github/. Anything else fails and is named.
+#   2. The content gates (internal hostnames, secrets, tooling/planning
+#      artefacts, local-runtime remnants) re-run over the tree; any hit fails.
+
+name: verify-surface
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+permissions: {}
+
+jobs:
+  verify-surface:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '20'
+
+      - name: Verify the public surface (allowlist + content gates, fail closed)
+        run: node .github/workflows/verify-surface.mjs

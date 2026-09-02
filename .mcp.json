@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "deriv-api": {
+      "type": "http",
+      "url": "https://PLACEHOLDER-deriv-api-mcp.run.app/mcp"
+    }
+  }
+}

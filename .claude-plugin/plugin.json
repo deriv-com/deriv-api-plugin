@@ -1,0 +1,9 @@
+{
+  "name": "deriv-api",
+  "version": "2.0.0",
+  "description": "Query Deriv's trading API schemas live and follow task-based guides for auth, subscriptions, trading, and error handling.",
+  "author": { "name": "Deriv", "email": "api-support@deriv.com" },
+  "homepage": "https://developers.deriv.com",
+  "repository": "https://github.com/deriv-com/deriv-api-plugin",
+  "license": "MIT"
+}

@@ -1,0 +1,193 @@
+# publish.yml — PUBLIC-repo promotion receiver (deriv-com/deriv-api-plugin).
+#
+# Receives the `repository_dispatch` fired by the PRIVATE repo's
+# promote-public.yml, VALIDATES the payload and the artifact before trusting
+# either, then commits the tree, updates a marker-anchored CHANGELOG.md, and cuts
+# a release. Mirrors deriv-com/deriv-api-schemas/.github/workflows/publish.yml
+# (the organisation's promotion pattern). Staged into the public repo by the
+# private repo's promotion bundle build.
+#
+# INERT until the promotion App credentials are provisioned. It carries no live
+# secrets: the GitHub App credentials
+# (PROMOTION_APP_ID / PROMOTION_APP_PRIVATE_KEY) and the expected source repo
+# (PROMOTION_SOURCE_REPO) are provisioned when the promotion App lands. The
+# first population is a MANUAL, human-reviewed push of the staged tree; this
+# receiver becomes the steady-state path afterwards.
+#
+# Non-negotiables carried over from the schemas workflow (the promotion policy):
+#   - short-lived GitHub App installation tokens, never a PAT;
+#   - workflow-level `permissions: {}`, escalated per job;
+#   - every action SHA-pinned;
+#   - a `concurrency` group and `timeout-minutes`;
+#   - idempotent re-runs (edit-or-create the release; replace, not append, the
+#     CHANGELOG entry);
+#   - an auto-filed issue on failure with the run URL.
+#
+# NB the expected source repo is read from `vars.PROMOTION_SOURCE_REPO` rather
+# than hardcoded, so the private repo's name never lands in this public tree.
+
+name: publish
+
+on:
+  repository_dispatch:
+    types: [surface_release_ready]
+
+permissions: {}
+
+concurrency:
+  group: publish-${{ github.event.client_payload.tag }}
+  cancel-in-progress: false
+
+env:
+  EXPECTED_ARTIFACT: plugin-surface.tar.gz
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write # commit the tree, cut the release
+      issues: write # file the failure issue
+    steps:
+      # 1. Validate the dispatch payload BEFORE trusting anything in it.
+      - name: Validate dispatch payload
+        env:
+          SOURCE_REPO: ${{ github.event.client_payload.source_repo }}
+          EXPECTED_SOURCE: ${{ vars.PROMOTION_SOURCE_REPO }}
+          TAG: ${{ github.event.client_payload.tag }}
+          ARTIFACT: ${{ github.event.client_payload.artifact_name }}
+          NOTES: ${{ github.event.client_payload.notes }}
+        run: |
+          set -euo pipefail
+          fail() { echo "FAIL: $1" >&2; exit 1; }
+          [ -n "${EXPECTED_SOURCE:-}" ] || fail "PROMOTION_SOURCE_REPO is not configured"
+          [ "${SOURCE_REPO:-}" = "${EXPECTED_SOURCE}" ] || fail "source_repo '${SOURCE_REPO:-}' is not the expected promoter"
+          echo "${TAG:-}" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$' || fail "tag '${TAG:-}' is not a vN.N.N release tag"
+          [ "${ARTIFACT:-}" = "${EXPECTED_ARTIFACT}" ] || fail "artifact_name '${ARTIFACT:-}' != expected '${EXPECTED_ARTIFACT}'"
+          [ -n "${NOTES:-}" ] || fail "release notes are empty"
+          echo "payload OK: ${SOURCE_REPO} ${TAG} ${ARTIFACT}"
+
+      # 2. Mint a short-lived App installation token (never a PAT).
+      - name: Mint GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@d72941d797fd3113feb6b93fd0dec494b13a2547 # v2.0.2
+        with:
+          app-id: ${{ secrets.PROMOTION_APP_ID }}
+          private-key: ${{ secrets.PROMOTION_APP_PRIVATE_KEY }}
+          # The App is installed on both the source (contents:read) and this repo
+          # (contents:write). Scope the token to the source for the download.
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ github.event.repository.name }},${{ github.event.client_payload.source_repo_name }}
+
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+
+      # 3. Download the release asset from the source repo, then VALIDATE its
+      #    format and content BEFORE unpacking (reject an oversized or
+      #    traversal-bearing archive).
+      - name: Download and validate the artifact
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          SOURCE_REPO: ${{ github.event.client_payload.source_repo }}
+          TAG: ${{ github.event.client_payload.tag }}
+        run: |
+          set -euo pipefail
+          fail() { echo "FAIL: $1" >&2; exit 1; }
+          mkdir -p _incoming
+          gh release download "${TAG}" \
+            --repo "${SOURCE_REPO}" \
+            --pattern "${EXPECTED_ARTIFACT}" \
+            --dir _incoming || fail "could not download ${EXPECTED_ARTIFACT} from ${SOURCE_REPO}@${TAG}"
+          asset="_incoming/${EXPECTED_ARTIFACT}"
+          [ -f "$asset" ] || fail "artifact missing after download"
+          # Size ceiling — the runtime surface is tiny; anything large is wrong.
+          size=$(wc -c < "$asset")
+          [ "$size" -le 1048576 ] || fail "artifact is ${size} B (> 1 MiB ceiling)"
+          # Must be a gzip tarball.
+          gzip -t "$asset" || fail "artifact is not valid gzip"
+          # Reject absolute paths or `..` traversal in any member.
+          if tar -tzf "$asset" | grep -Eq '(^/|(^|/)\.\.(/|$))'; then
+            fail "artifact contains an absolute path or a '..' traversal member"
+          fi
+
+      # 4. Unpack into a clean staging dir and re-validate the surface with this
+      #    repo's own guard before committing anything.
+      - name: Unpack and re-verify the surface
+        run: |
+          set -euo pipefail
+          rm -rf _staged && mkdir _staged
+          tar -xzf "_incoming/${EXPECTED_ARTIFACT}" -C _staged
+          # Re-run the surface guard against the unpacked tree. Use --dir (a
+          # filesystem walk): the unpacked tree is not git-tracked, so the
+          # default `git ls-files` mode would see zero files and pass vacuously.
+          node _staged/.github/workflows/verify-surface.mjs --dir _staged \
+            || { echo "FAIL: unpacked tree failed the surface guard" >&2; exit 1; }
+
+      # 5. Commit the tree idempotently (only if it changed) — replace, don't
+      #    duplicate. Preserve this repo's .git and .github machinery.
+      - name: Commit the promoted tree
+        env:
+          TAG: ${{ github.event.client_payload.tag }}
+        run: |
+          set -euo pipefail
+          # Replace the tracked runtime surface with the staged tree, keeping the
+          # repo's own .github/ and .git/.
+          rsync -a --delete \
+            --exclude '.git' --exclude '.github' \
+            --exclude '_staged' --exclude '_incoming' \
+            _staged/ ./
+          git config user.name "deriv-api-plugin-bot"
+          git config user.email "api-support@deriv.com"
+          if git diff --quiet && git diff --cached --quiet; then
+            echo "no surface change for ${TAG}; nothing to commit"
+          else
+            git add -A -- ':!_staged' ':!_incoming'
+            git commit -m "chore: promote runtime surface ${TAG}"
+            git push
+          fi
+          rm -rf _staged _incoming
+
+      # 6. Update the marker-anchored CHANGELOG (replace this tag's block, don't
+      #    append a duplicate), then cut/refresh the release idempotently.
+      - name: Update CHANGELOG and cut the release
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          TAG: ${{ github.event.client_payload.tag }}
+          NOTES: ${{ github.event.client_payload.notes }}
+        run: |
+          set -euo pipefail
+          # CHANGELOG lives under .github/ so the public tree stays exactly the
+          # 13 allowlisted runtime paths + this repo's own .github/ (the
+          # surface guard rejects any other root path).
+          node .github/workflows/update-changelog.mjs "${TAG}" "${NOTES}"
+          # Stage first, then diff the index: `git diff --quiet` alone cannot see
+          # a brand-new untracked CHANGELOG.md (the first population), so it would
+          # silently skip the commit forever. `--cached` compares against HEAD and
+          # catches both the create and the replace cases.
+          git add .github/CHANGELOG.md
+          if ! git diff --cached --quiet .github/CHANGELOG.md; then
+            git commit -m "docs: changelog for ${TAG}"
+            git push
+          fi
+          # Edit-or-create the release (idempotent).
+          if gh release view "${TAG}" >/dev/null 2>&1; then
+            gh release edit "${TAG}" --notes "${NOTES}"
+          else
+            gh release create "${TAG}" --title "${TAG}" --notes "${NOTES}"
+          fi
+
+      # 7. On any failure, file an issue with the run URL so a silent failure is
+      #    impossible.
+      - name: File an issue on failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          TAG: ${{ github.event.client_payload.tag }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          gh issue create \
+            --title "Promotion publish failed for ${TAG:-unknown tag}" \
+            --body "The promotion receiver (publish.yml) failed. Run: ${RUN_URL}" \
+            --label promotion,ci-failure || echo "could not file failure issue"
