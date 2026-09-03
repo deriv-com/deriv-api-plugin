@@ -11,7 +11,7 @@
       "name": "deriv-api",
       "source": "./",
       "displayName": "Deriv API (Beta)",
-      "description": "Query Deriv's trading API schemas live and follow task-based guides for auth, subscriptions, trading, and error handling.",
+      "description": "Get live Deriv API schemas plus guides for authentication, subscriptions, trades, and errors.",
       "category": "payments",
       "tags": ["trading", "fintech", "api", "websocket"],
       "logo": "assets/logo.svg"
