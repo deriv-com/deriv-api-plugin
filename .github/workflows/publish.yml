@@ -9,7 +9,8 @@
 #
 # INERT until the promotion App credentials are provisioned. It carries no live
 # secrets: the GitHub App credentials
-# (PROMOTION_APP_ID / PROMOTION_APP_PRIVATE_KEY) and the expected source repo
+# (the org App pair CLIENT_ID_GHAPP_WRITE / PRIVATE_KEY_GHAPP_WRITE, which this
+# repo must be granted access to) and the expected source repo
 # (PROMOTION_SOURCE_REPO) are provisioned when the promotion App lands. The
 # first population is a MANUAL, human-reviewed push of the staged tree; this
 # receiver becomes the steady-state path afterwards.
@@ -72,8 +73,8 @@ jobs:
         id: app-token
         uses: actions/create-github-app-token@d72941d797fd3113feb6b93fd0dec494b13a2547 # v2.0.2
         with:
-          app-id: ${{ secrets.PROMOTION_APP_ID }}
-          private-key: ${{ secrets.PROMOTION_APP_PRIVATE_KEY }}
+          app-id: ${{ secrets.CLIENT_ID_GHAPP_WRITE }}
+          private-key: ${{ secrets.PRIVATE_KEY_GHAPP_WRITE }}
           # The App is installed on both the source (contents:read) and this repo
           # (contents:write). Scope the token to the source for the download.
           owner: ${{ github.repository_owner }}
