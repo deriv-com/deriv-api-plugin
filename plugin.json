@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "deriv-api",
-  "description": "Query Deriv's trading API schemas live and follow task-based guides for auth, subscriptions, trading, and error handling.",
+  "description": "Get live Deriv API schemas plus guides for authentication, subscriptions, trades, and errors.",
   "version": "2.0.2",
   "author": { "name": "Deriv", "email": "api-support@deriv.com" },
   "homepage": "https://developers.deriv.com",
