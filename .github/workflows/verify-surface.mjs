@@ -41,6 +41,7 @@ const ALLOW = new Set([
   '.claude-plugin/marketplace.json',
   'rules/deriv-api-conventions.mdc',
   'assets/logo.svg',
+  'assets/logo.png',
   'LICENSE',
   'README.md',
   'CONTRIBUTING.md',
