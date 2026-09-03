@@ -2,7 +2,7 @@
 // verify-surface.mjs — PUBLIC-repo surface guard, run by verify-surface.yml.
 //
 // Self-contained on purpose: the private build script is never promoted, so this
-// inlines the same allowlist (the 13 runtime paths) and the content-gate
+// inlines the same allowlist (the runtime paths) and the content-gate
 // patterns. Keep it in step with the source repository's promotion tooling — with ONE
 // intentional exception: internal hostname and repository-name gating is enforced
 // ONLY on the private side (the source repository's promotion build), which runs before anything
