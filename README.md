@@ -1,7 +1,7 @@
 # Deriv API plugin (Beta)
 
 A plugin that gives an AI coding agent first-class knowledge of the Deriv API.
-It is a **thin client**: it points both **Cursor** and **Claude Code** at a
+It is a **thin client**: it points **Cursor**, **Claude Code**, and **Codex** at a
 **hosted Deriv API MCP server** over HTTP, and ships one Cursor rule alongside
 it. The hosted server exposes the tools that search endpoints; read the current
 request/response schemas, fields, and worked examples; validate payloads; and
@@ -42,6 +42,14 @@ git clone https://github.com/deriv-com/deriv-api-plugin ~/.cursor/plugins/local/
 ```
 
 Then reload the Cursor window so the plugin is picked up.
+
+### Codex
+
+```
+codex plugin marketplace add deriv-com/deriv-api-plugin
+```
+
+That registers this repository as a Codex marketplace. Install **Deriv API (Beta)** from the Plugins Directory, then restart Codex so it picks up the hosted MCP server. To refresh an existing install after a listing change, run `codex plugin marketplace upgrade`.
 
 ### Upgrading from version 1
 

@@ -1,0 +1,45 @@
+{
+  "name": "deriv-api",
+  "version": "2.0.2",
+  "description": "Get live Deriv API schemas plus guides for authentication, subscriptions, trades, and errors.",
+  "author": {
+    "name": "Deriv",
+    "email": "api-support@deriv.com",
+    "url": "https://developers.deriv.com"
+  },
+  "homepage": "https://developers.deriv.com",
+  "repository": "https://github.com/deriv-com/deriv-api-plugin",
+  "license": "MIT",
+  "keywords": [
+    "deriv",
+    "trading",
+    "api",
+    "websocket",
+    "rest",
+    "options",
+    "finance",
+    "fintech"
+  ],
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Deriv API (Beta)",
+    "shortDescription": "Get live Deriv API schemas",
+    "longDescription": "Get live Deriv API schemas plus guides for authentication, subscriptions, trades, and errors. Search endpoints, read current request and response fields, take worked examples, and validate payloads. The plugin does not sign in to a Deriv account, store keys, or place trades.",
+    "developerName": "Deriv",
+    "category": "Developer Tools",
+    "capabilities": ["Read"],
+    "websiteURL": "https://developers.deriv.com",
+    "privacyPolicyURL": "https://github.com/deriv-com/deriv-api-plugin/blob/master/PRIVACY.md",
+    "termsOfServiceURL": "https://github.com/deriv-com/deriv-api-plugin/blob/master/LICENSE",
+    "supportURL": "https://github.com/deriv-com/deriv-api-plugin/issues",
+    "brandColor": "#FF444F",
+    "defaultPrompt": [
+      "Look up the live request and response schema for a Deriv API endpoint",
+      "Validate this Deriv API request payload against the live schema",
+      "Explain Deriv API authentication, subscriptions, and error handling"
+    ],
+    "composerIcon": "./assets/logo.png",
+    "logo": "./assets/logo.png",
+    "logoDark": "./assets/logo-dark.png"
+  }
+}
