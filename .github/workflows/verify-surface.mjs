@@ -42,15 +42,104 @@ const ALLOW = new Set([
   '.codex-plugin/plugin.json',
   '.agents/plugins/marketplace.json',
   'rules/deriv-api-conventions.mdc',
-  'assets/logo.svg',
   'assets/logo.png',
-  'assets/logo-dark.svg',
   'assets/logo-dark.png',
   'LICENSE',
   'README.md',
   'CONTRIBUTING.md',
   'SECURITY.md',
   'PRIVACY.md',
+  'skills/deriv-auth/SKILL.md',
+  'skills/deriv-auth/agents/openai.yaml',
+  'skills/deriv-auth/references/implementation-checklist.md',
+  'skills/deriv-llms/SKILL.md',
+  'skills/deriv-llms/references/account-nickname.md',
+  'skills/deriv-llms/references/active-symbols.md',
+  'skills/deriv-llms/references/api-overview.md',
+  'skills/deriv-llms/references/authentication.md',
+  'skills/deriv-llms/references/auto-get.md',
+  'skills/deriv-llms/references/auto-list-strategies.md',
+  'skills/deriv-llms/references/auto-list.md',
+  'skills/deriv-llms/references/auto-pause.md',
+  'skills/deriv-llms/references/auto-resume.md',
+  'skills/deriv-llms/references/auto-start.md',
+  'skills/deriv-llms/references/auto-stop.md',
+  'skills/deriv-llms/references/balance.md',
+  'skills/deriv-llms/references/bulk-purchase.md',
+  'skills/deriv-llms/references/buy.md',
+  'skills/deriv-llms/references/cancel.md',
+  'skills/deriv-llms/references/contract-types.md',
+  'skills/deriv-llms/references/contract-update-history.md',
+  'skills/deriv-llms/references/contract-update.md',
+  'skills/deriv-llms/references/contracts-for.md',
+  'skills/deriv-llms/references/contracts-list.md',
+  'skills/deriv-llms/references/create-account.md',
+  'skills/deriv-llms/references/errors.md',
+  'skills/deriv-llms/references/examples.md',
+  'skills/deriv-llms/references/forget-all.md',
+  'skills/deriv-llms/references/forget.md',
+  'skills/deriv-llms/references/get-accounts.md',
+  'skills/deriv-llms/references/getting-started.md',
+  'skills/deriv-llms/references/health.md',
+  'skills/deriv-llms/references/markup-statistics.md',
+  'skills/deriv-llms/references/oauth.md',
+  'skills/deriv-llms/references/payment-agent-client-settings-update.md',
+  'skills/deriv-llms/references/payment-agent-client-settings.md',
+  'skills/deriv-llms/references/payment-agent-get.md',
+  'skills/deriv-llms/references/payment-agent-list.md',
+  'skills/deriv-llms/references/payment-agent-statistics.md',
+  'skills/deriv-llms/references/payment-agent-transfer-status.md',
+  'skills/deriv-llms/references/payment-agent-transfer.md',
+  'skills/deriv-llms/references/payment-agent-withdraw-status.md',
+  'skills/deriv-llms/references/payment-agent-withdraw-verification.md',
+  'skills/deriv-llms/references/payment-agent-withdraw.md',
+  'skills/deriv-llms/references/ping.md',
+  'skills/deriv-llms/references/portfolio.md',
+  'skills/deriv-llms/references/profit-table.md',
+  'skills/deriv-llms/references/proposal-open-contract.md',
+  'skills/deriv-llms/references/proposal.md',
+  'skills/deriv-llms/references/reset-demo-balance.md',
+  'skills/deriv-llms/references/sell.md',
+  'skills/deriv-llms/references/statement.md',
+  'skills/deriv-llms/references/ticks-history.md',
+  'skills/deriv-llms/references/ticks.md',
+  'skills/deriv-llms/references/time.md',
+  'skills/deriv-llms/references/trading-times.md',
+  'skills/deriv-llms/references/transaction.md',
+  'skills/deriv-llms/references/wallet-list.md',
+  'skills/deriv-llms/references/wallet-transactions.md',
+  'skills/deriv-llms/references/websocket.md',
+  'skills/deriv-llms/references/workflows.md',
+  'skills/deriv-llms/references/ws-demo.md',
+  'skills/deriv-llms/references/ws-public.md',
+  'skills/deriv-llms/references/ws-real.md',
+  'skills/deriv-market-data/SKILL.md',
+  'skills/deriv-market-data/agents/openai.yaml',
+  'skills/deriv-market-data/references/implementation-checklist.md',
+  'skills/deriv-trade-lifecycle/SKILL.md',
+  'skills/deriv-trade-lifecycle/agents/openai.yaml',
+  'skills/deriv-trade-lifecycle/references/implementation-checklist.md',
+  'skills/deriv-trade-types/SKILL.md',
+  'skills/deriv-trade-types/agents/openai.yaml',
+  'skills/deriv-trade-types/references/accumulators.md',
+  'skills/deriv-trade-types/references/advanced.md',
+  'skills/deriv-trade-types/references/barrier-options.md',
+  'skills/deriv-trade-types/references/catalog.md',
+  'skills/deriv-trade-types/references/digits.md',
+  'skills/deriv-trade-types/references/multipliers.md',
+  'skills/deriv-trade-types/references/up-down.md',
+  'skills/deriv-trade-types/references/vanilla-turbos.md',
+  'skills/deriv-trading-app/SKILL.md',
+  'skills/deriv-trading-app/agents/openai.yaml',
+  'skills/deriv-trading-app/references/new-api-only.md',
+  'skills/deriv-llms/references/partners-analytics-overview.md',
+  'skills/deriv-llms/references/partners-client-tags-check.md',
+  'skills/deriv-llms/references/wallet-exchange-rate.md',
+  'skills/deriv-llms/references/wallet-transfer-exchange.md',
+  'skills/deriv-llms/references/wallet-transfer-platforms.md',
+  'skills/deriv-llms/references/wallet-transfer-validate.md',
+  'skills/deriv-llms/references/wallet-transfer.md',
+  'skills/deriv-trading-app/references/chart-selection.md',
 ]);
 
 // NOTE: there is deliberately NO internal-hostnames gate here. Internal hostname
@@ -80,7 +169,7 @@ const CONTENT_GATES = [
       new RegExp('\\b' + ['ds', 'tp'].join('') + '\\b'),
       /PLAN\.md/,
       /(^|[\s"'(/])specs\//m,
-      /\.claude\//,
+      /(?<!~\/)\.claude\//,
       new RegExp('\\.' + ['build', 'wright'].join('')),
       new RegExp('\\.' + ['spec', 'to', 'pr'].join('-')),
       /AGENTS\.md/,
@@ -91,7 +180,6 @@ const CONTENT_GATES = [
     id: 'local-runtime',
     patterns: [
       /(^|[\s"'(/])mcp\//m,
-      /(^|[\s"'(/])skills\//m,
       /node_modules/,
       /(^|[\s"'(/])dist\//m,
     ],
@@ -228,18 +316,18 @@ const codex = loadJson('.codex-plugin/plugin.json');
 if (codex) {
   const iface = codex.interface && typeof codex.interface === 'object' ? codex.interface : null;
   if (!iface) fail('codex listing: interface object is required');
-  if (codex.name !== 'deriv-api') fail('codex listing: name must be deriv-api');
+  if (codex.name !== 'deriv') fail('codex listing: name must be deriv');
   if (typeof codex.version !== 'string' || !SEMVER.test(codex.version)) {
     fail('codex listing: version must be semver');
   }
   if (typeof codex.description !== 'string' || !codex.description || codex.description.length > 1024) {
     fail('codex listing: description is required and must be 1024 characters or fewer');
   }
-  if (!codex.author || codex.author.name !== 'Deriv') fail('codex listing: author.name must be Deriv');
+  if (!codex.author || codex.author.name !== 'deriv') fail('codex listing: author.name must be deriv');
   if (codex.mcpServers !== './.mcp.json') {
     fail('codex listing: mcpServers must be ./.mcp.json so the hosted server is imported');
   }
-  if (codex.skills != null) fail('codex listing: skills must be omitted; this plugin has no skills/ tree');
+  if (codex.skills !== './skills/') fail('codex listing: skills must be ./skills/');
   if (codex.apps != null) fail('codex listing: apps must be omitted; there is no .app.json');
   if (iface) {
     if (iface.developerName !== codex.author.name) {
@@ -294,7 +382,7 @@ if (marketplace) {
   const entry = Array.isArray(marketplace.plugins) ? marketplace.plugins[0] : null;
   if (!entry) fail('codex listing: marketplace must declare one plugin entry');
   else {
-    if (entry.name !== 'deriv-api') fail('codex listing: marketplace plugin name must be deriv-api');
+    if (entry.name !== 'deriv') fail('codex listing: marketplace plugin name must be deriv');
     if (!entry.source || entry.source.source !== 'local' || entry.source.path !== './') {
       fail('codex listing: marketplace source must be local path ./');
     }

@@ -1,21 +1,9 @@
-# Deriv API plugin (Beta)
+# Deriv API plugin
 
-A plugin that gives an AI coding agent first-class knowledge of the Deriv API.
-It is a **thin client**: it points **Cursor**, **Claude Code**, and **Codex** at a
-**hosted Deriv API MCP server** over HTTP, and ships one Cursor rule alongside
-it. The hosted server exposes the tools that search endpoints; read the current
-request/response schemas, fields, and worked examples; validate payloads; and
-serve task-based guidance for auth, subscriptions, trading, and error handling.
-
-The plugin itself contains only the plugin manifests, the single remote MCP
-declaration, and the Cursor rule file. There is **no local MCP server and no
-bundled copy of the API surface** — schemas and docs are read live by the hosted
-server when a tool is called, so the plugin never carries a stale copy.
-
-> **Staging endpoint.** The plugin currently connects to the **staging**
-> deployment of the hosted Deriv API MCP server, declared in `.mcp.json`. Staging
-> tracks the server's main branch and may change without notice; a later plugin
-> release will point at the production endpoint.
+A plugin that gives an AI coding agent Deriv API knowledge. Installing it as a
+native plugin for Cursor, Claude Code, and Codex adds the hosted MCP server plus
+bundled Agent Skills. Agents that only support the Agent Skills standard can
+install the skills separately.
 
 ## Install
 
@@ -23,22 +11,20 @@ server when a tool is called, so the plugin never carries a stale copy.
 
 ```
 /plugin marketplace add deriv-com/deriv-api-plugin
-/plugin install deriv-api@deriv-api-marketplace
+/plugin install deriv@deriv
 ```
 
 The first command registers the public repository as a plugin marketplace; the
-second installs the plugin from it. The plugin declares a remote MCP server, so
-nothing runs on your machine: no local server, and no Node or Python to install.
-Claude Code connects to the plugin's server without a separate approval prompt.
+second installs the plugin from it. No Node or Python is required. Claude Code
+connects to the plugin's server without a separate approval prompt.
 
 ### Cursor
 
-Cursor's marketplace/URL import is available to **Teams and Enterprise** only;
-individual users cannot add this plugin by URL. Until the plugin is listed,
-install it by cloning it into your Cursor local plugins directory:
+Cursor's own marketplace/URL import is available to **Teams and Enterprise** only;
+individual users cannot add this plugin through a Cursor marketplace by URL.
 
 ```
-git clone https://github.com/deriv-com/deriv-api-plugin ~/.cursor/plugins/local/deriv-api
+git clone https://github.com/deriv-com/deriv-api-plugin ~/.cursor/plugins/local/deriv
 ```
 
 Then reload the Cursor window so the plugin is picked up.
@@ -49,40 +35,69 @@ Then reload the Cursor window so the plugin is picked up.
 codex plugin marketplace add deriv-com/deriv-api-plugin
 ```
 
-That registers this repository as a Codex marketplace. Install **Deriv API (Beta)** from the Plugins Directory, then restart Codex so it picks up the hosted MCP server. To refresh an existing install after a listing change, run `codex plugin marketplace upgrade`.
-
-### Upgrading from version 1
-
-Version 1 shipped a local MCP server and skills under the same plugin name. If
-it is still installed, the new plugin is **not loaded and no error is shown**.
-Remove version 1 first.
-
-Claude Code:
-
-```
-/plugin uninstall deriv-api@deriv-api-marketplace
-/plugin marketplace remove deriv-api-marketplace
-```
-
-then run the two install commands above. Cursor: delete the old `deriv-api`
-folder from `~/.cursor/plugins/local/`, clone the new one as above, and reload
-the window.
+That registers this repository as a Codex marketplace. Install **deriv** from the
+Plugins Directory, then restart Codex so it picks up the hosted MCP server. To
+refresh an existing install after a listing change, run `codex plugin marketplace upgrade`.
 
 ### Verify it works
 
-In Claude Code, run `/mcp` and confirm `deriv-api` shows as connected with
-twelve tools. In Cursor, open the MCP settings and confirm the same. If the
-server shows as disconnected, the hosted endpoint is unreachable from your
-network; the plugin has no offline fallback by design.
+In Claude Code, run `/mcp` and confirm `deriv` shows as connected, with its
+tools listed. In Cursor, open the MCP settings and confirm the same. If the
+hosted endpoint is unreachable, the bundled skills still load; follow those
+instead of inventing field lists. Do not invent field lists in either case.
+
+## Skills only
+
+This path copies `skills/` only and does not add the hosted MCP.
+
+If your agent cannot install a plugin, add the skills with:
+
+```
+npx skills add https://github.com/deriv-com/deriv-api-plugin
+```
+
+That command is the `npx skills` CLI at https://skills.sh.
+
+Or copy the folders under `skills/` into the personal skills directory for your
+agent:
+
+| Agent | Skill directory |
+| --- | --- |
+| Claude Code | `~/.claude/skills/` |
+| Cursor | `~/.cursor/skills/` |
+| OpenCode | `~/.config/opencode/skills/` |
+| Codex | `~/.codex/skills/` |
+| Pi | `~/.pi/agent/skills/` |
+
+If the plugin is already installed on that host, do not also copy skills or run
+`npx skills`. Doing both can load the same skills twice.
+
+## Skills
+
+| Skill | Useful for |
+| --- | --- |
+| `deriv-trading-app` | Build or extend an authenticated trading application |
+| `deriv-auth` | Authentication, OAuth, tokens, accounts, and sessions |
+| `deriv-market-data` | Market discovery and live prices |
+| `deriv-trade-types` | Map user-facing trade names to contract families |
+| `deriv-trade-lifecycle` | Proposal, buy, monitor, sell, and settlement |
+| `deriv-llms` | Bundled docs snapshot when hosted MCP is unavailable |
+
+## MCP
+
+| Server key | URL | Purpose |
+| --- | --- | --- |
+| `deriv` | `https://mcp-api-v2.deriv.com/mcp` | Live schemas, field facts, payload validation, and task guides |
 
 ## Usage
 
-Once installed, the plugin's MCP tools and the Cursor rule are available to the
-agent automatically. **No credentials and no configuration are required** — the
-hosted server reads public Deriv API documentation and schemas to answer
-questions and validate payloads; it does not sign in, store keys, or ask you to
-set anything up. When you build an integration that itself calls the Deriv API,
-your own application supplies its own credentials; the plugin never handles them.
+Once installed, the plugin's MCP tools, the Cursor rule, and the bundled skills
+are available to the agent automatically. **No credentials and no configuration
+are required** — the hosted server reads public Deriv API documentation and
+schemas to answer questions and validate payloads; it does not sign in, store
+keys, or ask you to set anything up. When you build an integration that itself
+calls the Deriv API, your own application supplies its own credentials; the
+plugin never handles them.
 
 ## Where to go next
 

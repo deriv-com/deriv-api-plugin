@@ -1,9 +1,9 @@
 {
-  "name": "deriv-api",
-  "displayName": "Deriv API (Beta)",
-  "version": "2.0.2",
+  "name": "deriv",
+  "displayName": "deriv",
+  "version": "1.0.0",
   "description": "Get live Deriv API schemas plus guides for authentication, subscriptions, trades, and errors.",
-  "author": { "name": "Deriv", "email": "api-support@deriv.com" },
+  "author": { "name": "deriv", "email": "api-support@deriv.com" },
   "homepage": "https://developers.deriv.com",
   "repository": "https://github.com/deriv-com/deriv-api-plugin",
   "license": "MIT",

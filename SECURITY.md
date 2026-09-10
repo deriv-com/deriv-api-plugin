@@ -5,7 +5,7 @@ API plugin and how to report a vulnerability.
 
 ## Trust boundary
 
-The plugin is a thin client. The trust boundary runs:
+The trust boundary runs:
 
 ```
 your MCP host  ⟷  Deriv-hosted read-only MCP server  ⟷  developers.deriv.com
@@ -39,8 +39,10 @@ data. There are two failure modes:
   cache to fall back on — an explicit error telling the agent not to answer from
   prior knowledge.
 - **Hosted server unreachable.** If the Deriv-hosted MCP server itself is down,
-  your MCP host reports the MCP as disconnected and no Deriv tool is available;
-  there is no local fallback that would answer from a stale copy.
+  your MCP host reports the MCP as disconnected and no Deriv tool is available.
+  Follow the bundled skill files shipped with the plugin instead of guessing;
+  those files are read locally when MCP is down. Do not invent fields that are
+  not in those files.
 
 Every successful answer carries a `_source` freshness label so the agent can
 tell how current the underlying documentation is.

@@ -2,10 +2,10 @@
 
 Thanks for your interest in improving the Deriv API plugin.
 
-The plugin is a thin client that points **Cursor** and **Claude Code** at a
-hosted Deriv API MCP server and ships one Cursor rule. It holds no credentials
-and runs no local server, so most contributions are to the documentation, the
-manifests, or the Cursor rule.
+See [`README.md`](README.md) for how to install. Partners install it as
+**deriv**. The Cursor local-clone path is `~/.cursor/plugins/local/deriv`.
+
+Contributions are to documentation, manifests, and bundled skills.
 
 ## How to contribute
 

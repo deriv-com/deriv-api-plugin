@@ -1,9 +1,9 @@
 {
-  "name": "deriv-api",
-  "version": "2.0.2",
+  "name": "deriv",
+  "version": "1.0.0",
   "description": "Get live Deriv API schemas plus guides for authentication, subscriptions, trades, and errors.",
   "author": {
-    "name": "Deriv",
+    "name": "deriv",
     "email": "api-support@deriv.com",
     "url": "https://developers.deriv.com"
   },
@@ -21,11 +21,12 @@
     "fintech"
   ],
   "mcpServers": "./.mcp.json",
+  "skills": "./skills/",
   "interface": {
-    "displayName": "Deriv API (Beta)",
+    "displayName": "deriv",
     "shortDescription": "Get live Deriv API schemas",
     "longDescription": "Get live Deriv API schemas plus guides for authentication, subscriptions, trades, and errors. Search endpoints, read current request and response fields, take worked examples, and validate payloads. The plugin does not sign in to a Deriv account, store keys, or place trades.",
-    "developerName": "Deriv",
+    "developerName": "deriv",
     "category": "Developer Tools",
     "capabilities": ["Read"],
     "websiteURL": "https://developers.deriv.com",

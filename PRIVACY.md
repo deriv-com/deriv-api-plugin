@@ -4,11 +4,11 @@ This document describes what data the Deriv API plugin does and does not handle.
 
 ## Data flow
 
-The plugin is a thin client. When one of its tools is called, the request is
-sent to the Deriv-hosted MCP server whose URL is declared in `.mcp.json`, and
-that hosted server is what fetches public Deriv API documentation and schemas
-from the Deriv developer docs host. Your queries therefore reach Deriv
-infrastructure — they are not answered entirely within the MCP host.
+When one of its tools is called, the request is sent to the Deriv-hosted MCP
+server whose URL is declared in `.mcp.json`, and that hosted server is what
+fetches public Deriv API documentation and schemas from the Deriv developer docs
+host. Your queries therefore reach Deriv infrastructure — they are not answered
+entirely within the MCP host.
 
 What reaches the Deriv-hosted server on each call is:
 
@@ -22,6 +22,11 @@ What reaches the Deriv-hosted server on each call is:
 
 The plugin does not add any account, profile, or credential to these requests —
 what it sends is the tool call the agent made, and nothing more.
+
+When the hosted MCP is down, the bundled skill files that ship with the plugin
+are read locally on the developer's machine. That local read is not a tool call:
+it does not send those queries to the Deriv-hosted server. When MCP is used,
+tool-call queries still reach Deriv infrastructure as described above.
 
 ## Analytics
 

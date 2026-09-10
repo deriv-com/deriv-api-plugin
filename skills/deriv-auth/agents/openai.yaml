@@ -1,0 +1,11 @@
+interface:
+  display_name: "Trading Authentication"
+  short_description: "Add secure authentication to trading apps"
+  default_prompt: "Use $deriv-auth to add OAuth, account selection, and an authenticated trading socket."
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "deriv"
+      description: "Live Deriv authentication guides and endpoint schemas"
+      transport: "streamable_http"
+      url: "https://mcp-api-v2.deriv.com/mcp"

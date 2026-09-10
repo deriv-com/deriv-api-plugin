@@ -20,3 +20,6 @@ the hosted MCP fact tools rather than hardcoding it:
   field schemas from the live surface.
 - **`validate_payload`** — check a request body against the live schema.
 - **`get_example`** — get a worked request example.
+
+If those hosted tools are unavailable, follow the bundled `deriv-llms` and task
+skills instead of guessing.

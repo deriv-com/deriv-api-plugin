@@ -1,11 +1,11 @@
 {
-  "name": "deriv-api-marketplace",
+  "name": "deriv",
   "interface": {
-    "displayName": "Deriv API"
+    "displayName": "deriv"
   },
   "plugins": [
     {
-      "name": "deriv-api",
+      "name": "deriv",
       "source": {
         "source": "local",
         "path": "./"
