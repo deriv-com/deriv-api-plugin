@@ -1,6 +1,6 @@
 ---
 name: deriv-market-data
-description: Implement New Deriv API Options market and contract discovery plus price streams with active symbols, contracts for a symbol, contract listings, ticks, and tick history. Use whenever a task involves market or symbol selectors, deciding which trade types a symbol supports, deriving trade controls from contract metadata, live tick or price subscriptions, charts, or public read-only feeds — even if the user just says "show live prices", "list the volatility indices", or "why is this duration rejected". Not for order execution or Legacy API compatibility.
+description: Add New Deriv API market discovery and live prices — active symbols, contracts for a symbol, ticks, and tick history. Use whenever a task involves market or symbol selectors, deciding which trade types a symbol supports, deriving trade controls from contract metadata, live tick or price subscriptions, charts, or public read-only feeds — even if the user just says "show live prices", "list the volatility indices", or "why is this duration rejected". Not for order execution or Legacy API compatibility.
 ---
 
 ## Hosted MCP first, then bundled references

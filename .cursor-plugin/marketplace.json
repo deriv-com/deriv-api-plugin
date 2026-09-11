@@ -1,17 +1,17 @@
 {
   "name": "deriv",
   "owner": {
-    "name": "deriv",
+    "name": "Deriv",
     "email": "api-support@deriv.com"
   },
   "metadata": {
-    "description": "Deriv API plugin marketplace — live schema queries and task-based guides for the Deriv trading API."
+    "description": "Live schemas and guides for the Deriv trading API."
   },
   "plugins": [
     {
       "name": "deriv",
       "source": "./",
-      "description": "Get live Deriv API schemas plus guides for authentication, subscriptions, trades, and errors."
+      "description": "Live Deriv API schemas, payload validation, and guides for authentication, subscriptions, trades, and errors."
     }
   ]
 }

@@ -1,6 +1,6 @@
 ---
 name: deriv-auth
-description: Implement or repair New Deriv API authentication, including OAuth 2.0 Authorization Code with PKCE, PAT handling, callback and session security, account selection, and OTP-authenticated Options WebSocket connections. Use whenever a task involves Deriv login, sign-up, tokens, scopes, sessions, accounts, account switching, logout, reconnects, or obtaining a trading WebSocket — even if the user just says "users can't log in", "hook up Deriv OAuth", "get an authenticated socket", or "reconnecting loses the session". Not for Legacy API compatibility.
+description: Add or fix New Deriv API authentication — OAuth, tokens, accounts, and trading WebSocket sessions. Use whenever a task involves Deriv login, sign-up, OAuth with PKCE, personal access tokens, OTP, tokens, scopes, sessions, accounts, account switching, logout, reconnects, or obtaining a trading WebSocket — even if the user just says "users can't log in", "hook up Deriv OAuth", "get an authenticated socket", or "reconnecting loses the session". Not for Legacy API compatibility.
 ---
 
 ## Hosted MCP first, then bundled references

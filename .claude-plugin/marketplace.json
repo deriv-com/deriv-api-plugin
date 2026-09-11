@@ -1,18 +1,18 @@
 {
   "name": "deriv",
   "owner": {
-    "name": "deriv",
+    "name": "Deriv",
     "email": "api-support@deriv.com",
     "url": "https://developers.deriv.com"
   },
-  "description": "Deriv API plugin marketplace — live schema queries and task-based guides for the Deriv trading API.",
+  "description": "Live schemas and guides for the Deriv trading API.",
   "plugins": [
     {
       "name": "deriv",
       "source": "./",
-      "displayName": "deriv",
+      "displayName": "Deriv",
       "homepage": "https://developers.deriv.com",
-      "description": "Get live Deriv API schemas plus guides for authentication, subscriptions, trades, and errors.",
+      "description": "Live Deriv API schemas, payload validation, and guides for authentication, subscriptions, trades, and errors.",
       "category": "payments",
       "tags": ["trading", "fintech", "api", "websocket"],
       "logo": "https://raw.githubusercontent.com/deriv-com/deriv-api-plugin/master/assets/logo.png"

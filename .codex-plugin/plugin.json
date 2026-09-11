@@ -1,7 +1,7 @@
 {
   "name": "deriv",
   "version": "1.0.0",
-  "description": "Get live Deriv API schemas plus guides for authentication, subscriptions, trades, and errors.",
+  "description": "Live Deriv API schemas, payload validation, and guides for authentication, subscriptions, trades, and errors.",
   "author": {
     "name": "deriv",
     "email": "api-support@deriv.com",
@@ -23,9 +23,9 @@
   "mcpServers": "./.mcp.json",
   "skills": "./skills/",
   "interface": {
-    "displayName": "deriv",
-    "shortDescription": "Get live Deriv API schemas",
-    "longDescription": "Get live Deriv API schemas plus guides for authentication, subscriptions, trades, and errors. Search endpoints, read current request and response fields, take worked examples, and validate payloads. The plugin does not sign in to a Deriv account, store keys, or place trades.",
+    "displayName": "Deriv",
+    "shortDescription": "Deriv API schemas and guides",
+    "longDescription": "Live Deriv API schemas, payload validation, and guides for authentication, subscriptions, trades, and errors. Search endpoints, read current request and response fields, use worked examples, and validate payloads. This plugin doesn't sign in to a Deriv account, store keys, or place trades.",
     "developerName": "deriv",
     "category": "Developer Tools",
     "capabilities": ["Read"],
@@ -35,9 +35,9 @@
     "supportURL": "https://github.com/deriv-com/deriv-api-plugin/issues",
     "brandColor": "#FF444F",
     "defaultPrompt": [
-      "Look up the live request and response schema for a Deriv API endpoint",
-      "Validate this Deriv API request payload against the live schema",
-      "Explain Deriv API authentication, subscriptions, and error handling"
+      "Look up the live schema for a Deriv API endpoint",
+      "Validate a Deriv API request payload against the live schema",
+      "Set up Deriv API authentication, subscriptions, and error handling"
     ],
     "composerIcon": "./assets/logo.png",
     "logo": "./assets/logo.png",
