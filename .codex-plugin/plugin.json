@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Live Deriv API schemas, payload validation, and guides for authentication, subscriptions, trades, and errors.",
   "author": {
-    "name": "Deriv",
+    "name": "deriv",
     "email": "api-support@deriv.com",
     "url": "https://developers.deriv.com"
   },
@@ -24,9 +24,9 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Deriv",
-    "shortDescription": "Live Deriv API schemas and guides",
+    "shortDescription": "Deriv API schemas and guides",
     "longDescription": "Live Deriv API schemas, payload validation, and guides for authentication, subscriptions, trades, and errors. Search endpoints, read current request and response fields, use worked examples, and validate payloads. This plugin doesn't sign in to a Deriv account, store keys, or place trades.",
-    "developerName": "Deriv",
+    "developerName": "deriv",
     "category": "Developer Tools",
     "capabilities": ["Read"],
     "websiteURL": "https://developers.deriv.com",
