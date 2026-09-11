@@ -1,6 +1,6 @@
 ---
 name: deriv-llms
-description: Snapshot of the Deriv API llms.txt index and endpoint pages for when hosted MCP tools are unavailable. Use when looking up Deriv API endpoints, authentication, errors, workflows, contract types, or field lists from the bundled docs; when the hosted MCP is down; or when the user asks for llms.txt / endpoint pages. Prefer hosted get_schema, get_field, and guide tools while they work. Do not invent fields.
+description: Use the bundled Deriv API docs snapshot when hosted MCP tools are unavailable. Use when looking up Deriv API endpoints, authentication, errors, workflows, contract types, or field lists from the bundled docs; when the hosted MCP is down; or when the user asks for llms.txt / endpoint pages. Prefer hosted get_schema, get_field, and guide tools while they work. Do not invent fields.
 ---
 
 ## Hosted MCP first, then bundled references

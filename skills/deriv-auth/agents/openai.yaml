@@ -1,5 +1,5 @@
 interface:
-  display_name: "Trading Authentication"
+  display_name: "Trading authentication"
   short_description: "Add secure authentication to trading apps"
   default_prompt: "Use $deriv-auth to add OAuth, account selection, and an authenticated trading socket."
 dependencies:

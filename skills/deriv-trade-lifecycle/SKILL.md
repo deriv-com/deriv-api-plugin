@@ -1,6 +1,6 @@
 ---
 name: deriv-trade-lifecycle
-description: Implement and test the New Deriv API Options lifecycle from streaming proposal through buy, open-contract monitoring, portfolio reconciliation, optional update, cancellation or sell, settlement, reconnect, and subscription cleanup. Use whenever a task prices or purchases a contract, tracks open or closed positions, sells early, sets take profit, handles buy or sell errors, or recovers mid-trade from a disconnect — even if the user just says "the buy button fails", "show my open trades", or "sell at market". Not for Legacy API compatibility or OAuth setup alone.
+description: Implement the New Deriv API Options flow: price, buy, monitor, sell, and settle. Use whenever a task prices or purchases a contract, tracks open or closed positions, sells early, sets take profit, handles buy or sell errors, or recovers mid-trade from a disconnect — even if the user just says "the buy button fails", "show my open trades", or "sell at market". Not for Legacy API compatibility or OAuth setup alone.
 ---
 
 ## Hosted MCP first, then bundled references

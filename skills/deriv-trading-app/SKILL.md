@@ -1,6 +1,6 @@
 ---
 name: deriv-trading-app
-description: Build or extend an authenticated trading application backed by the New Deriv API Options platform by composing authentication, market discovery, trade families, and the proposal-to-position lifecycle. Use whenever a task involves creating or extending a Deriv-powered trading product in any form — an app, template, terminal, bot, or trade screen; adding or combining trade types in one product; or wiring login, live prices, and purchase together — even if the user just says "build me a trading app", "add trading to my site", or names trade families like Accumulators and Rise/Fall together. Not for Legacy API compatibility or general explanations of financial derivatives.
+description: Build or extend an authenticated trading application on the New Deriv API Options platform. Use whenever a task involves creating or extending a Deriv-powered trading product in any form — an app, template, terminal, bot, or trade screen; adding or combining trade types in one product; or wiring login, live prices, and purchase together — even if the user just says "build me a trading app", "add trading to my site", or names trade families like Accumulator options and Rise/Fall together. Not for Legacy API compatibility or general explanations of financial derivatives.
 ---
 
 ## Hosted MCP first, then bundled references

@@ -1,6 +1,6 @@
 ---
 name: deriv-trade-types
-description: Translate user-facing trade names into New Deriv API Options contract families, proposal shapes, compatible controls, and live availability. Use whenever a task selects, adds, or configures a Deriv Options trade type — Accumulators, Rise/Fall, Higher/Lower, Matches/Differs, Even/Odd, Over/Under, Multipliers, Touch/No Touch, Stays In/Goes Out, Vanilla, Turbos, Asians, Reset, or tick high/low — even if the user just says "up/down", "digits", "binary call/put", or "add accumulators to my bot" without naming contract codes. Not for Legacy API compatibility or CFD execution.
+description: Map trade names to New Deriv API Options contract families, proposal shapes, and live availability. Use whenever a task selects, adds, or configures a Deriv Options trade type — Accumulator options, Rise/Fall, Higher/Lower, Matches/Differs, Even/Odd, Over/Under, Multipliers, Touch/No Touch, Stays Between / Goes Outside, Vanilla options, Turbo options, Asian options, Reset Call / Reset Put, or High/Low Ticks — even if the user just says "up/down", "digits", "Call/Put", or "add accumulators to my bot" without naming contract codes. Not for Legacy API compatibility or CFD execution.
 ---
 
 ## Hosted MCP first, then bundled references

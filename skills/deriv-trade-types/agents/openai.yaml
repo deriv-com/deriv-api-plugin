@@ -1,11 +1,11 @@
 interface:
-  display_name: "Trading Contract Types"
+  display_name: "Trading contract types"
   short_description: "Configure options contract families and controls"
-  default_prompt: "Use $deriv-trade-types to add Accumulators and Rise/Fall trade choices."
+  default_prompt: "Use $deriv-trade-types to add Accumulator options and Rise/Fall."
 dependencies:
   tools:
     - type: "mcp"
       value: "deriv"
-      description: "Live Deriv contract schemas, examples, and payload validation"
+      description: "Live Deriv API guides, schemas, examples, and payload validation"
       transport: "streamable_http"
       url: "https://mcp-api-v2.deriv.com/mcp"

@@ -1,7 +1,7 @@
 interface:
-  display_name: "Trading Application"
-  short_description: "Compose authenticated trading applications"
-  default_prompt: "Use $deriv-trading-app to build an authenticated app with Accumulators and Rise/Fall."
+  display_name: "Trading application"
+  short_description: "Build authenticated trading applications"
+  default_prompt: "Use $deriv-trading-app to build an authenticated app with Accumulator options and Rise/Fall."
 dependencies:
   tools:
     - type: "mcp"

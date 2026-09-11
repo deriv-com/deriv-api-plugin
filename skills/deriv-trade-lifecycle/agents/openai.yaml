@@ -1,11 +1,11 @@
 interface:
-  display_name: "Trading Lifecycle"
-  short_description: "Implement proposal, execution, and positions"
-  default_prompt: "Use $deriv-trade-lifecycle to add proposal, buy, monitor, and sell flows."
+  display_name: "Trading lifecycle"
+  short_description: "Price, buy, monitor, and sell trades"
+  default_prompt: "Use $deriv-trade-lifecycle to add pricing, buy, monitor, and sell flows."
 dependencies:
   tools:
     - type: "mcp"
       value: "deriv"
-      description: "Live Deriv trading schemas, examples, and payload validation"
+      description: "Live Deriv API guides, schemas, examples, and payload validation"
       transport: "streamable_http"
       url: "https://mcp-api-v2.deriv.com/mcp"
