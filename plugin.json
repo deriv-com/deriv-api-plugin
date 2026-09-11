@@ -3,7 +3,7 @@
   "name": "deriv",
   "description": "Live Deriv API schemas, payload validation, and guides for authentication, subscriptions, trades, and errors.",
   "version": "1.0.0",
-  "author": { "name": "deriv", "email": "api-support@deriv.com" },
+  "author": { "name": "Deriv", "email": "api-support@deriv.com" },
   "homepage": "https://developers.deriv.com",
   "repository": "https://github.com/deriv-com/deriv-api-plugin",
   "license": "MIT",
