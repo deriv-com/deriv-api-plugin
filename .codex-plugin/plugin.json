@@ -1,6 +1,6 @@
 {
   "name": "deriv",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Live Deriv API schemas, payload validation, and guides for authentication, subscriptions, trades, and errors.",
   "author": {
     "name": "deriv",

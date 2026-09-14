@@ -140,6 +140,15 @@ const ALLOW = new Set([
   'skills/deriv-llms/references/wallet-transfer-validate.md',
   'skills/deriv-llms/references/wallet-transfer.md',
   'skills/deriv-trading-app/references/chart-selection.md',
+  'skills/deriv-lightweight-charts/SKILL.md',
+  'skills/deriv-lightweight-charts/agents/openai.yaml',
+  'skills/deriv-lightweight-charts/references/setup-and-feed.md',
+  'skills/deriv-lightweight-charts/references/trade-overlays.md',
+  'skills/deriv-smartcharts/SKILL.md',
+  'skills/deriv-smartcharts/agents/openai.yaml',
+  'skills/deriv-smartcharts/references/chart-data-and-assets.md',
+  'skills/deriv-smartcharts/references/feed-adapter.md',
+  'skills/deriv-smartcharts/references/trade-overlays.md',
 ]);
 
 // NOTE: there is deliberately NO internal-hostnames gate here. Internal hostname
@@ -169,7 +178,7 @@ const CONTENT_GATES = [
       new RegExp('\\b' + ['ds', 'tp'].join('') + '\\b'),
       /PLAN\.md/,
       /(^|[\s"'(/])specs\//m,
-      /(?<!~\/)\.claude\//,
+      /\.claude\/(?!skills\/)|(?<!~\/)\.claude\/skills\//,
       new RegExp('\\.' + ['build', 'wright'].join('')),
       new RegExp('\\.' + ['spec', 'to', 'pr'].join('-')),
       /AGENTS\.md/,
