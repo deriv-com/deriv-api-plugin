@@ -6,6 +6,6 @@ dependencies:
   tools:
     - type: "mcp"
       value: "deriv"
-      description: "Live Deriv API guides, schemas, examples, and payload validation"
+      description: "Live Deriv contract schemas, examples, and payload validation"
       transport: "streamable_http"
       url: "https://mcp-api-v2.deriv.com/mcp"

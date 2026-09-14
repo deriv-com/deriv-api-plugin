@@ -11,7 +11,7 @@ If those tools are missing or fail, read this skill and its `references/`. Do no
 
 Never name a host-namespaced tool; use the bare tool name only.
 
-Snapshot: these pages were fetched from developers.deriv.com on 2026-09-10. They are a point-in-time snapshot, not a live source — while the hosted Deriv API MCP tools work, they are authoritative.
+Snapshot: these pages were fetched from developers.deriv.com on 2026-09-14. They are a point-in-time snapshot, not a live source — while the hosted Deriv API MCP tools work, they are authoritative.
 
 # Deriv API
 

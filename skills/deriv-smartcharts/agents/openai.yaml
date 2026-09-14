@@ -1,0 +1,11 @@
+interface:
+  display_name: "SmartCharts Price Chart"
+  short_description: "Add the Deriv SmartCharts chart fed by the app's shared socket"
+  default_prompt: "Use $deriv-smartcharts to add a price chart with barriers and trade markers to my Deriv trading app."
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "deriv"
+      description: "Live Deriv tick-history, subscription, and trading-times schemas the chart feed must follow"
+      transport: "streamable_http"
+      url: "https://mcp-api-v2.deriv.com/mcp"

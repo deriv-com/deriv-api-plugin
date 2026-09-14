@@ -6,7 +6,7 @@ An application built with these skills can render its price chart with either do
 
 | | SmartCharts (`@deriv-com/smartcharts-champion`) | Lightweight Charts (`lightweight-charts`, TradingView) |
 |---|---|---|
-| Skill | deriv-smartcharts | deriv-lightweight-charts |
+| Skill | [deriv-smartcharts](../../deriv-smartcharts/SKILL.md) | [deriv-lightweight-charts](../../deriv-lightweight-charts/SKILL.md) |
 | What it is | Deriv's full trading chart: the same component behind Deriv's own trading platform | A rendering library for financial series; no trading concepts built in |
 | Built in | Symbol browser, trading-times awareness, chart types and granularities, technical indicators, drawing tools, barriers, contract markers with a documented lifecycle, mobile layout | Candles, line, area, baseline, histogram; streaming `update`; price lines; series markers; multi-pane; a primitives API for custom drawings |
 | The application must build | The feed adapter and the `chartData` metadata (active symbols plus trading times) | The feed adapter **and** every trading feature: symbol picker, market-closed state, indicators if wanted, and the barrier/marker overlay layer (documented per family, adaptable from TradingView's official plugin examples) |

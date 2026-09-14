@@ -81,6 +81,8 @@ If the plugin is already installed on that host, do not also copy skills or run
 | `deriv-market-data` | Market discovery and live prices |
 | `deriv-trade-types` | Map user-facing trade names to contract families |
 | `deriv-trade-lifecycle` | Proposal, buy, monitor, sell, and settlement |
+| `deriv-lightweight-charts` | Add the default slim price chart with barriers and trade markers |
+| `deriv-smartcharts` | Add the terminal-grade chart with indicators and drawing tools |
 | `deriv-llms` | Bundled docs snapshot when hosted MCP is unavailable |
 
 ## MCP

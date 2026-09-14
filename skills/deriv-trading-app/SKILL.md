@@ -27,7 +27,7 @@ Read and apply these sibling skills as the request requires:
 2. Read the [market-data flow](../deriv-market-data/SKILL.md) for symbols, contract availability, controls derived from contract metadata, ticks, or charts.
 3. Read the [trade-type flow](../deriv-trade-types/SKILL.md), then only the references for the families the user requested.
 4. Read the [trade lifecycle](../deriv-trade-lifecycle/SKILL.md) whenever the app prices, buys, monitors, updates, cancels, or sells a contract.
-5. Whenever the app renders a price chart, read the [chart selection guide](references/chart-selection.md) — Lightweight Charts by default, SmartCharts when the requirements or the user call for it — then read the chart skill it selects: Lightweight Charts or SmartCharts.
+5. Whenever the app renders a price chart, read the [chart selection guide](references/chart-selection.md) — Lightweight Charts by default, SmartCharts when the requirements or the user call for it — then read the chart skill it selects: [Lightweight Charts](../deriv-lightweight-charts/SKILL.md) or [SmartCharts](../deriv-smartcharts/SKILL.md).
 
 ## Resolve the request before coding
 
