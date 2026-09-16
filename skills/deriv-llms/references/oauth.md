@@ -103,7 +103,7 @@ Your app must verify `state` matches the value stored before the redirect, then 
 
 | Problem | Likely cause | Fix |
 |---------|--------------|-----|
-| State mismatch error | `state` in callback doesn't match stored value | Store `state` in `sessionStorage` before redirecting |
+| State mismatch error | `state` in callback doesn't match stored value | Store OAuth state server-side unless the browser owns initiation, in which case sessionStorage is permitted. Never default OAuth state to sessionStorage for a BFF. |
 | `invalid_grant` on token exchange | `code_verifier` doesn't match the challenge, or code expired | Send the original `code_verifier`, not a new one; exchange immediately |
 | Redirect URI mismatch | URL doesn't exactly match registration | Check trailing slashes, http vs https, port numbers |
 | `invalid_client` | Wrong `client_id` | Verify credentials from the Deriv dashboard |

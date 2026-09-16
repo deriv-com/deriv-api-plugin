@@ -1,5 +1,7 @@
 # Trade overlays: drawing barriers and contract results
 
+> **Version anchor.** The drawing APIs this file records — `createPriceLine`, `createSeriesMarkers`, `attachPrimitive` / `detachPrimitive`, `addPane` / `moveToPane`, and the separate whitespace-only series — were observed against `lightweight-charts@5.2.1`, the version this skill was authored and reviewed against between 2026-09-08 and 2026-09-09. Re-confirm each against the installed `typings.d.ts`: a major bump changes them, as the v4-to-v5 rename of the series API shows.
+
 The library has no contract model, but it exposes every primitive needed to draw one. *What* to draw per family — which barrier, which spots, which label — is defined once in the [SmartCharts skill's trade overlays](../../deriv-smartcharts/references/trade-overlays.md) and derived from the proposal and open-contract state the trade-lifecycle skill owns. This file covers only *how to draw it here*. Scope it with the user: a chart that shows only the price feed is a complete first deliverable, and overlays can follow.
 
 ## The drawing toolbox

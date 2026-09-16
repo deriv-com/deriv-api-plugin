@@ -1,5 +1,7 @@
 # Trade overlays: barriers and contract markers
 
+> **Version anchor.** The prop shapes this file records — the `barriers` configuration, and `contracts_array` being undocumented in the package README so its entries come from the component source — were observed when this skill was housed on 2026-09-07, and the `@deriv-com/smartcharts-champion` version they were observed against was not recorded. The nearest version this skill records is `1.12.0`, observed on 2026-09-09 for the behaviour in [chart data and assets](chart-data-and-assets.md), but these prop shapes were not re-confirmed against it. Re-confirm each against the version your application installs.
+
 Overlays make the chart part of the trading experience: the barrier a contract is measured against, and the entry, running state, and exit of each contract. Both are *derived views* of state the trade-lifecycle skill already owns. The chart never invents them.
 
 ## Barriers

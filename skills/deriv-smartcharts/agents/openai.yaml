@@ -1,5 +1,5 @@
 interface:
-  display_name: "SmartCharts Price Chart"
+  display_name: "SmartCharts price chart"
   short_description: "Add the Deriv SmartCharts chart fed by the app's shared socket"
   default_prompt: "Use $deriv-smartcharts to add a price chart with barriers and trade markers to my Deriv trading app."
 dependencies:

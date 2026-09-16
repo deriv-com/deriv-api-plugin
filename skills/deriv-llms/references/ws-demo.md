@@ -17,13 +17,11 @@ Public market data needs no auth. Authenticated trading uses an OTP URL (issued 
 
 ## Example
 
+Connect to the URL returned by the OTP endpoint only. Do not send an auth or upgrade message on the public socket.
+
 ```javascript
-const ws = new WebSocket("wss://api.derivws.com/trading/v1/options/ws/public");
-ws.onopen = () => {
-  ws.send(JSON.stringify({
-  "ws_demo": 1
-}));
-};
+const otpUrl = otpResponse.data.url;
+const ws = new WebSocket(otpUrl);
 ws.onmessage = (event) => console.log(JSON.parse(event.data));
 ```
 

@@ -14,8 +14,11 @@ your MCP host  ⟷  Deriv-hosted read-only MCP server  ⟷  developers.deriv.com
 - **Client to hosted server.** The MCP host connects to the Deriv-hosted MCP
   server whose URL is declared in `.mcp.json` over **HTTPS**. The connection is
   **unauthenticated and credential-free**: no authentication is required to call
-  the server, and none is accepted. The plugin does not sign in to Deriv, does
-  not read or write any API tokens, and asks you to configure nothing.
+  the server, and none is accepted. The plugin does not sign in to Deriv and
+  does not collect API tokens. It asks you to configure nothing. There are
+  no user Deriv credentials in this plugin.
+  The hosted server's own deployment secrets are never part of the plugin;
+  deployment secrets are not in this repo.
 - **Hosted server to Deriv docs.** The server fetches from a **single approved
   origin**, `developers.deriv.com`, and no other. It reads public documentation
   and schemas only.
@@ -23,11 +26,13 @@ your MCP host  ⟷  Deriv-hosted read-only MCP server  ⟷  developers.deriv.com
 The hosted server is **read-only**. None of its tools writes, holds a
 credential, signs in, or places a trade — the tools search endpoints, read
 schemas, fields, and worked examples, validate payloads, and serve task-based
-guidance. The server holds no secrets.
+guidance.
 
+The plugin does not collect, store, or send the user's Deriv account credentials.
+Tool-call arguments, including a `validate_payload` body, reach the hosted
+server, so keep API tokens and other secrets out of tool-call arguments.
 If your own application authenticates to Deriv — for example via OAuth — that is
-your application's concern. Those credentials belong to your application and are
-never handled, stored, or transmitted by this plugin.
+your application's concern.
 
 ## Failure modes
 
@@ -50,9 +55,10 @@ tell how current the underlying documentation is.
 ## Reporting a vulnerability
 
 If you believe you have found a security issue, please report it privately to
-the maintaining team, **`@deriv_api_v2_team`**, rather than opening a public
-issue. Include enough detail to reproduce the problem and, where relevant, the
-potential impact. The team will acknowledge the report and follow up on a fix.
+**api-support@deriv.com** (Slack **`@deriv_api_v2_team`**), rather than
+opening a public issue. Include enough detail to reproduce the problem and,
+where relevant, the potential impact. The team will acknowledge the report
+and follow up on a fix.
 
 > Note: `mcp-api.deriv.com` is a separate Deriv MCP operated by a different team
 > and is not the server this plugin points at.

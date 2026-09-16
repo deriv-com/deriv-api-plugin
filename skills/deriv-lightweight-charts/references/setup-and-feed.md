@@ -1,5 +1,7 @@
 # Setup and feed: one series, one socket
 
+> **Version anchor.** The library behaviour this file records — the v5 `addSeries` API in place of v4's `add…Series()` methods, the production build's `Cannot update oldest data` throw, the development-only sort assertion, and whitespace rows counting as points — was observed against `lightweight-charts@5.2.1`, the version this skill was authored and reviewed against between 2026-09-08 and 2026-09-09. The two `pip_size` meanings were read from the live API on 2026-09-09. Re-confirm every option name against the installed `typings.d.ts`: a major bump changes these APIs, as the v4-to-v5 rename recorded here shows.
+
 The library exposes a chart, series on that chart, and two data calls per series: `setData` for the full history and `update` for the latest point. The adapter's job is to fill those from the application's existing tick-history request and subscription on the shared WebSocket, and nothing else.
 
 ## Install and create

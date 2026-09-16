@@ -11,11 +11,16 @@
 # self-contained — it inlines the same allowlist and content-gate patterns. Keep
 # it in step with the source repository's promotion tooling when either changes.
 #
-# Two checks, both FAIL CLOSED:
-#   1. Every tracked path is an allowlisted runtime path OR under this repo's own
-#      .github/. Anything else fails and is named.
-#   2. The content gates (internal hostnames, secrets, tooling/planning
-#      artefacts, local-runtime remnants) re-run over the tree; any hit fails.
+# Checks, all FAIL CLOSED:
+#   1. Surface: every tracked path is an allowlisted runtime path OR under this
+#      repo's own .github/. Anything else fails and is named.
+#   2. Presence: SECURITY.md, PRIVACY.md, and .mcp.json must exist.
+#   3. MCP URL pin: mcpServers.deriv is type "http" at
+#      https://mcp-api-v2.deriv.com/mcp.
+#   4. Content gates: secrets, tooling/planning artefacts, local-runtime
+#      remnants. No internal-hostnames gate on this public checker.
+#   5. Internal-reference scan over .github/.
+#   6. Codex listing contract.
 
 name: verify-surface
 
