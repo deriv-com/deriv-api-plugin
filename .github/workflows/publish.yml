@@ -49,9 +49,11 @@ jobs:
     permissions:
       contents: write # commit the tree, cut the release
       issues: write # file the failure issue
+      # GITHUB_TOKEN has no workflows: key; the App needs Workflows: write to push publish.yml.
     steps:
       # 1. Validate the dispatch payload BEFORE trusting anything in it.
       - name: Validate dispatch payload
+        id: payload
         env:
           SOURCE_REPO: ${{ github.event.client_payload.source_repo }}
           EXPECTED_SOURCE: ${{ vars.PROMOTION_SOURCE_REPO }}
@@ -67,18 +69,19 @@ jobs:
           [ "${ARTIFACT:-}" = "${EXPECTED_ARTIFACT}" ] || fail "artifact_name '${ARTIFACT:-}' != expected '${EXPECTED_ARTIFACT}'"
           [ -n "${NOTES:-}" ] || fail "release notes are empty"
           echo "payload OK: ${SOURCE_REPO} ${TAG} ${ARTIFACT}"
+          echo "source_repo_name=${EXPECTED_SOURCE##*/}" >> "$GITHUB_OUTPUT"
 
       # 2. Mint a short-lived App installation token (never a PAT).
       - name: Mint GitHub App token
         id: app-token
-        uses: actions/create-github-app-token@d72941d797fd3113feb6b93fd0dec494b13a2547 # v2.0.2
+        uses: actions/create-github-app-token@3ff1caaa28b64c9cc276ce0a02e2ff584f3900c5 # v2.0.2
         with:
           app-id: ${{ secrets.CLIENT_ID_GHAPP_WRITE }}
           private-key: ${{ secrets.PRIVATE_KEY_GHAPP_WRITE }}
           # The App is installed on both the source (contents:read) and this repo
-          # (contents:write). Scope the token to the source for the download.
+          # (contents:write + Workflows: write). GITHUB_TOKEN does not push this file.
           owner: ${{ github.repository_owner }}
-          repositories: ${{ github.event.repository.name }},${{ github.event.client_payload.source_repo_name }}
+          repositories: ${{ github.event.repository.name }},${{ steps.payload.outputs.source_repo_name }}
 
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
@@ -108,7 +111,8 @@ jobs:
           # Must be a gzip tarball.
           gzip -t "$asset" || fail "artifact is not valid gzip"
           # Reject absolute paths or `..` traversal in any member.
-          if tar -tzf "$asset" | grep -Eq '(^/|(^|/)\.\.(/|$))'; then
+          listing=$(tar -tzf "$asset")
+          if grep -Eq '(^/|(^|/)\.\.(/|$))' <<<"$listing"; then
             fail "artifact contains an absolute path or a '..' traversal member"
           fi
 
@@ -117,12 +121,18 @@ jobs:
       - name: Unpack and re-verify the surface
         run: |
           set -euo pipefail
+          fail() { echo "FAIL: $1" >&2; exit 1; }
+          asset="_incoming/${EXPECTED_ARTIFACT}"
+          listing=$(tar -tvzf "$asset")
+          if grep -Eq '^[^-d]' <<<"$listing"; then
+            fail "artifact contains a non-regular, non-directory member (link/device/fifo)"
+          fi
           rm -rf _staged && mkdir _staged
-          tar -xzf "_incoming/${EXPECTED_ARTIFACT}" -C _staged
-          # Re-run the surface guard against the unpacked tree. Use --dir (a
-          # filesystem walk): the unpacked tree is not git-tracked, so the
-          # default `git ls-files` mode would see zero files and pass vacuously.
-          node _staged/.github/workflows/verify-surface.mjs --dir _staged \
+          tar -xzf "$asset" -C _staged
+          # Re-run the checked-out surface guard against the unpacked tree. Use
+          # --dir (a filesystem walk): the unpacked tree is not git-tracked, so
+          # the default `git ls-files` mode would see zero files and pass vacuously.
+          node .github/workflows/verify-surface.mjs --dir _staged \
             || { echo "FAIL: unpacked tree failed the surface guard" >&2; exit 1; }
 
       # 5. Commit the tree idempotently (only if it changed) — replace, don't
@@ -132,18 +142,25 @@ jobs:
           TAG: ${{ github.event.client_payload.tag }}
         run: |
           set -euo pipefail
-          # Replace the tracked runtime surface with the staged tree, keeping the
-          # repo's own .github/ and .git/.
+          fail() { echo "FAIL: $1" >&2; exit 1; }
+          deletes=$(rsync -a --delete --dry-run --itemize-changes \
+            --exclude '.git' --exclude '.github' \
+            --exclude '_staged' --exclude '_incoming' \
+            _staged/ ./ | grep -F '*deleting' || true)
+          if [ -n "$deletes" ]; then
+            fail "rsync --delete would remove extra public paths: ${deletes}"
+          fi
           rsync -a --delete \
             --exclude '.git' --exclude '.github' \
             --exclude '_staged' --exclude '_incoming' \
             _staged/ ./
+          cp _staged/.github/workflows/publish.yml .github/workflows/publish.yml
           git config user.name "deriv-api-plugin-bot"
           git config user.email "api-support@deriv.com"
-          if git diff --quiet && git diff --cached --quiet; then
+          git add -A -- ':!_staged' ':!_incoming'
+          if git diff --cached --quiet; then
             echo "no surface change for ${TAG}; nothing to commit"
           else
-            git add -A -- ':!_staged' ':!_incoming'
             git commit -m "chore: promote runtime surface ${TAG}"
             git push
           fi

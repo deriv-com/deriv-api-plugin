@@ -39,15 +39,22 @@ ws.onopen = () => ws.send(JSON.stringify({
 
 Note: the symbol field is `underlying_symbol`.
 
-### Step 3. Buy from the proposal id
+### Step 3. Confirm, then buy from the proposal id
+
+Wait for explicit user confirmation before sending buy. Do not auto-purchase.
 
 ```javascript
+let pendingProposal;
 ws.onmessage = (e) => {
   const msg = JSON.parse(e.data);
   if (msg.msg_type === 'proposal' && msg.proposal?.id) {
-    ws.send(JSON.stringify({ "buy": msg.proposal.id, "price": msg.proposal.ask_price }));
+    pendingProposal = msg.proposal;
   }
 };
+```
+
+```javascript
+onUserConfirmed(() => ws.send(JSON.stringify({ buy: pendingProposal.id, price: pendingProposal.ask_price })));
 ```
 
 ## Bulk purchase (REST, PAT auth — no Bearer)

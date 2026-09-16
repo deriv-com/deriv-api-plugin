@@ -9,15 +9,21 @@
 // leaves the source repo. This public checker carries NO internal-hostnames gate at
 // all, so it discloses none of those internal names.
 //
-// Two fail-closed checks over the public tree:
+// Fail-closed checks over the public tree:
 //   1. Surface: every path is an allowlisted runtime path OR under this repo's
 //      own `.github/`. Anything else fails and is named.
-//   2. Content gates: secrets/key material, tooling/planning artefacts, and
+//   2. Presence: SECURITY.md, PRIVACY.md, and .mcp.json must exist
+//      (independent of ALLOW).
+//   3. MCP URL pin: when .mcp.json is present, mcpServers.deriv must be
+//      type "http" at https://mcp-api-v2.deriv.com/mcp. No hostname-pattern gate.
+//   4. Content gates: secrets/key material, tooling/planning artefacts, and
 //      local-runtime remnants — any hit fails and is named. (Internal hostname /
 //      repo-name gating is private-side only, per the note above, so this public
 //      checker discloses none of those names.) The `.github/` CI machinery is
 //      exempt from the content grep (it carries the gate patterns themselves and
 //      automation tokens); it is covered by the surface check instead.
+//   5. Internal-reference scan over this repo's own `.github/` machinery.
+//   6. Codex listing contract.
 //
 // File source (two modes):
 //   - default: the committed tree via `git ls-files` (public-repo CI).
@@ -25,7 +31,7 @@
 //     freshly-unpacked, not-yet-tracked staging tree — `git ls-files` there would
 //     return empty and pass vacuously, a silent failure).
 //
-// Contract: exit 0 when both checks pass; exit non-zero and print `FAIL:` lines
+// Contract: exit 0 when all checks pass; exit non-zero and print `FAIL:` lines
 // otherwise.
 
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
@@ -226,7 +232,28 @@ for (const path of paths) {
   fail(`unexpected path outside the allowlist (+ .github/): "${path}"`);
 }
 
-// 2. Content gates over the runtime surface (skip the .github/ machinery).
+// 2. Presence gate.
+for (const file of ['SECURITY.md', 'PRIVACY.md', '.mcp.json']) {
+  if (!existsSync(join(root, file))) fail(`required file missing: ${file}`);
+}
+
+const PRODUCTION_MCP_URL = 'https://mcp-api-v2.deriv.com/mcp';
+// 3. MCP URL pin.
+if (existsSync(join(root, '.mcp.json'))) {
+  try {
+    const mcp = JSON.parse(readFileSync(join(root, '.mcp.json'), 'utf8'));
+    const deriv = mcp && mcp.mcpServers && mcp.mcpServers.deriv;
+    if (!deriv || deriv.type !== 'http' || deriv.url !== PRODUCTION_MCP_URL) {
+      fail(
+        `MCP URL pin: mcpServers.deriv must have type "http" and url ${PRODUCTION_MCP_URL}`,
+      );
+    }
+  } catch (err) {
+    fail(`MCP URL pin: .mcp.json is not valid JSON (${err.message})`);
+  }
+}
+
+// 4. Content gates over the runtime surface (skip the .github/ machinery).
 for (const path of paths) {
   if (path === '.github' || path.startsWith('.github/')) continue;
   const base = path.split('/').pop();
@@ -247,7 +274,7 @@ for (const path of paths) {
   }
 }
 
-// 3. Internal-reference scan over this repo's own .github/ machinery. The content
+// 5. Internal-reference scan over this repo's own .github/ machinery. The content
 //    gates above skip .github/ (it carries the gate patterns themselves), so this
 //    narrower scan covers the one thing that must never appear there: references
 //    to the source repository's private planning documents, issue numbers, or
@@ -274,7 +301,7 @@ for (const path of paths) {
   }
 }
 
-// 4. Codex listing contract. Official package rules require a relative
+// 6. Codex listing contract. Official package rules require a relative
 //    branding path (not an HTTPS URL), MCP declared as ./.mcp.json, and
 //    directory-submission length limits on the title and subtitle.
 const CODEX_CATEGORIES = new Set([
@@ -407,4 +434,4 @@ if (failures.length > 0) {
   console.error(`\nverify-surface: ${failures.length} problem(s) found`);
   process.exit(1);
 }
-console.log(`verify-surface: OK — ${paths.length} path(s), surface + content + internal-reference gates clean`);
+console.log(`verify-surface: OK — ${paths.length} path(s), surface + presence + MCP URL pin + content + internal-reference + Codex gates clean`);

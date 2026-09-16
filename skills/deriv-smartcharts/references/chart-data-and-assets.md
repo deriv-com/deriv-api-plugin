@@ -1,5 +1,7 @@
 # Chart data and runtime assets
 
+> **Version anchor.** The package behaviour this file records was observed against `@deriv-com/smartcharts-champion@1.12.0` on 2026-09-09 — the `shouldFetchTradingTimes` processing gate, the trading-times window and its timestamp parsing, and the `StrictMode` double-mount — and the two `pip_size` meanings were read from the live API on the same date. The duplicate-React, stale-service-worker, and mount-race pitfalls below were written when this skill was housed on 2026-09-07, and the package version they were observed against was not recorded, so treat those three as unanchored. Re-confirm every statement here against the version your application installs: a package bump invalidates any of them with no other signal.
+
 Two host responsibilities that are easy to miss and produce confusing failures: supplying the chart's market metadata, and serving the files the chart loads at runtime.
 
 ## `chartData`: active symbols plus trading times
@@ -17,7 +19,7 @@ Treat these as discovery reads shared with the rest of the application: fetch on
 The package lazy-loads its chart engine, code chunks, fonts, and sprite sheets at runtime instead of bundling them. Two steps make that work:
 
 1. **Serve the distributed assets.** Copy the package's `dist` chunks (`*.smartcharts.*`), its stylesheet, and its `chart/assets` directory into a location your app serves as static files, at install and build time, so a version bump of the package refreshes them without committed binaries. Read the package README's webpack notes for the exact file set for the installed version.
-2. **Declare where they live.** Call `setSmartChartsPublicPath` once, before the chart mounts, with the URL prefix those files are served from — and include any deployment base path (a preview environment served under a sub-path needs that prefix, or every lazy load 404s).
+2. **Declare where they live.** Call `setSmartChartsPublicPath` once, before the chart mounts, with the URL prefix those files are served from — and include any deployment base path (a preview environment served under a sub-path needs that prefix, or every lazy load 404s). The prefix must be same-origin or a first-party CDN you control. Do not point setSmartChartsPublicPath at a public npm CDN for the chart engine.
 
 Import the package stylesheet once at the application root.
 

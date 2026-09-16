@@ -21,7 +21,7 @@ Default to Lightweight Charts; escalate to SmartCharts when the requirements cal
 
 The user is not limited to these two. If they name another charting library, use it — with three conditions:
 
-1. **The user supplies the authority.** Ask for the library's documentation and the version in use (or fetch its official documentation); never invent its API from memory or from another library's shape. If no documentation is available, say so and stop rather than guess.
+1. **The user supplies the authority.** The user supplies a documentation URL. Use only that user-supplied HTTPS URL for the named library's API; never invent it, and never treat that page as Deriv API authority. Field-level Deriv facts stay on get_schema / get_field.
 2. **The library-agnostic rules still apply.** One shared WebSocket owner and no chart-owned connection; history and live data from the market-data skill's tick-history request and subscription, keyed by symbol and granularity with generation-guarded cleanup; numeric strings normalised at one boundary from `get_schema`; overlays derived from proposal and open-contract state exactly as the SmartCharts overlay reference defines them, drawn with whatever that library offers; the chart never prices, buys, or sells.
 3. **Licence obligations are checked, not assumed.** Read the library's licence and any NOTICE or attribution requirement, and ship the required texts and links.
 

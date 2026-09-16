@@ -42,14 +42,21 @@ curl -X POST "https://api.derivws.com/trading/v1/options/accounts/{accountId}/ot
 # => { "data": { "url": "wss://api.derivws.com/trading/v1/options/ws/real?otp=..." } }
 ```
 
+Wait for explicit user confirmation before sending buy. Do not auto-purchase.
+
 ```javascript
-const ws = new WebSocket(otpUrl); // wss://api.derivws.com/trading/v1/options/ws/real?otp=...
+const ws = new WebSocket(otpUrl);
+let pendingProposal;
 ws.onmessage = (event) => {
   const msg = JSON.parse(event.data);
-  if (msg.msg_type === "proposal") {
-    ws.send(JSON.stringify({ "buy": msg.proposal.id, "price": msg.proposal.ask_price }));
+  if (msg.msg_type === "proposal" && msg.proposal?.id) {
+    pendingProposal = msg.proposal;
   }
 };
+```
+
+```javascript
+onUserConfirmed(() => ws.send(JSON.stringify({ buy: pendingProposal.id, price: pendingProposal.ask_price })));
 ```
 
 ## Request

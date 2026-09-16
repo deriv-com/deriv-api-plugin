@@ -1,7 +1,7 @@
 {
   "name": "deriv",
   "displayName": "Deriv",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Live Deriv API schemas, payload validation, and guides for authentication, subscriptions, trades, and errors.",
   "author": { "name": "Deriv", "email": "api-support@deriv.com" },
   "homepage": "https://developers.deriv.com",

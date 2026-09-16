@@ -1,5 +1,7 @@
 # Feed adapter: chart callbacks over the shared socket
 
+> **Version anchor.** The callback contract this file records — the three callbacks, their arguments, and `style` reaching `getQuotes` alone — was observed when this skill was housed on 2026-09-07, and the `@deriv-com/smartcharts-champion` version it was observed against was not recorded. The nearest version this skill records is `1.12.0`, observed on 2026-09-09 for the behaviour in [chart data and assets](chart-data-and-assets.md), but these signatures were not re-confirmed against it. Re-confirm each against the version your application installs before you rely on it.
+
 SmartCharts asks the host for data through three callbacks and does nothing else on the network. The adapter's whole job is to translate those calls into the application's existing tick-history and subscription requests on the one shared WebSocket, and to normalise the answers into the shape the chart expects.
 
 ## The three callbacks

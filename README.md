@@ -15,8 +15,9 @@ install the skills separately.
 ```
 
 The first command registers the public repository as a plugin marketplace; the
-second installs the plugin from it. No Node or Python is required. Claude Code
-connects to the plugin's server without a separate approval prompt.
+second installs the plugin from it. No Node or Python is required.
+Installing the plugin approves its MCP server once, at install time;
+Claude Code may still prompt per tool call.
 
 ### Cursor
 
@@ -38,6 +39,9 @@ codex plugin marketplace add deriv-com/deriv-api-plugin
 That registers this repository as a Codex marketplace. Install **deriv** from the
 Plugins Directory, then restart Codex so it picks up the hosted MCP server. To
 refresh an existing install after a listing change, run `codex plugin marketplace upgrade`.
+If Codex shows an authentication step during install, that is Codex's
+generic MCP install flow — the plugin itself needs no Deriv sign-in
+and asks for no API token.
 
 ### Verify it works
 
@@ -95,11 +99,13 @@ If the plugin is already installed on that host, do not also copy skills or run
 
 Once installed, the plugin's MCP tools, the Cursor rule, and the bundled skills
 are available to the agent automatically. **No credentials and no configuration
-are required** — the hosted server reads public Deriv API documentation and
-schemas to answer questions and validate payloads; it does not sign in, store
-keys, or ask you to set anything up. When you build an integration that itself
-calls the Deriv API, your own application supplies its own credentials; the
-plugin never handles them.
+are required** — the plugin requires no Deriv account credentials. The hosted
+server reads public Deriv API documentation and schemas to answer questions and
+validate payloads; it does not sign in, store keys, or ask you to set anything
+up. Tool-call arguments, including a `validate_payload` body, reach the hosted
+server, so keep API tokens and other secrets out of tool-call arguments.
+When you build an integration that itself calls the Deriv API, your own
+application supplies its own credentials.
 
 ## Where to go next
 

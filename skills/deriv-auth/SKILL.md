@@ -41,6 +41,8 @@ If those tools are unavailable, use the live [authentication](https://developers
 
 Apply the browser OAuth/BFF boundary below to greenfield browser applications and to work explicitly scoped as an authentication migration. An existing repository may preserve its established component ownership and session topology when re-platforming is outside scope, but this is an architecture-only exception. It never permits Legacy API endpoints, WebSocket authentication, request fields, or response assumptions. If the shared seam violates the New API contract, migrate it once before extending it; do not add a second credential path.
 
+This architecture-only exception never includes storing Deriv access tokens, refresh tokens, or PATs in localStorage, in SPA-held session state, or in non-HttpOnly cookies. If an existing app does that, report the gap; do not extend the exception to cover it.
+
 - Generate fresh cryptographically random PKCE verifier, challenge, and state per attempt. Store pending transactions briefly, server-side when the BFF owns initiation or in `sessionStorage` when the browser owns initiation, and consume them once.
 - Validate state before trusting either a success or error callback. Exchange the code immediately and clean OAuth parameters from every terminal callback path while preserving unrelated URL state.
 - Perform the code exchange on a backend. Keep Deriv access/refresh tokens in protected server-side storage. For a browser/BFF deployment, give the browser an opaque application session in a `Secure`, `HttpOnly` cookie with an appropriate `SameSite` policy and CSRF protection.

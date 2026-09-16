@@ -1,5 +1,5 @@
 interface:
-  display_name: "Lightweight Charts Price Chart"
+  display_name: "Lightweight Charts price chart"
   short_description: "Add TradingView's Lightweight Charts fed by the app's shared socket"
   default_prompt: "Use $deriv-lightweight-charts to add a slim TradingView chart with barriers and trade markers to my Deriv trading app."
 dependencies:
