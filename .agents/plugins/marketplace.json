@@ -7,8 +7,9 @@
     {
       "name": "deriv",
       "source": {
-        "source": "local",
-        "path": "./"
+        "source": "url",
+        "url": "https://github.com/deriv-com/deriv-api-plugin.git",
+        "ref": "v1.0.4"
       },
       "policy": {
         "installation": "AVAILABLE",

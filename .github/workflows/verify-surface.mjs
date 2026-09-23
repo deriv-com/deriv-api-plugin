@@ -203,6 +203,11 @@ const CONTENT_GATES = [
 
 const failures = [];
 const fail = (m) => failures.push(m);
+const PIN_SOURCE_KEYS = new Set(['source', 'url', 'ref']);
+const pinSourceExtraKey = (source) => {
+  if (!source || typeof source !== 'object' || Array.isArray(source)) return null;
+  return Object.keys(source).find((key) => !PIN_SOURCE_KEYS.has(key)) ?? null;
+};
 
 // --dir <path> → filesystem-walk that path; otherwise git ls-files the cwd.
 const dirIdx = process.argv.indexOf('--dir');
@@ -411,6 +416,10 @@ if (codex) {
   if (cursor && cursor.version !== codex.version) {
     fail('codex listing: version must stay in lockstep with .cursor-plugin/plugin.json');
   }
+  const rootPlugin = loadJson('plugin.json');
+  if (rootPlugin && rootPlugin.version !== codex.version) {
+    fail('codex listing: version must stay in lockstep with plugin.json');
+  }
 }
 
 const marketplace = loadJson('.agents/plugins/marketplace.json');
@@ -419,13 +428,51 @@ if (marketplace) {
   if (!entry) fail('codex listing: marketplace must declare one plugin entry');
   else {
     if (entry.name !== 'deriv') fail('codex listing: marketplace plugin name must be deriv');
-    if (!entry.source || entry.source.source !== 'local' || entry.source.path !== './') {
-      fail('codex listing: marketplace source must be local path ./');
+    const expectedRef = typeof codex?.version === 'string' ? `v${codex.version}` : null;
+    const extra = pinSourceExtraKey(entry.source);
+    const isUrlPin =
+      entry.source &&
+      entry.source.source === 'url' &&
+      entry.source.url === 'https://github.com/deriv-com/deriv-api-plugin.git' &&
+      entry.source.ref === expectedRef;
+    if (extra && isUrlPin) fail(`.agents/plugins/marketplace.json: extra key "${extra}"`);
+    else if (!isUrlPin) {
+      fail('codex listing: marketplace source must be the url pin at the lockstep version tag');
     }
     if (!entry.policy || entry.policy.installation !== 'AVAILABLE' || entry.policy.authentication !== 'ON_INSTALL') {
       fail('codex listing: marketplace policy must be AVAILABLE / ON_INSTALL');
     }
     if (entry.category !== 'Developer Tools') fail('codex listing: marketplace category must be Developer Tools');
+  }
+}
+
+const claudeMarketplace = loadJson('.claude-plugin/marketplace.json');
+if (claudeMarketplace) {
+  const entry = Array.isArray(claudeMarketplace.plugins) ? claudeMarketplace.plugins[0] : null;
+  if (!entry) fail('claude listing: marketplace must declare one plugin entry');
+  else {
+    const claudePlugin = loadJson('.claude-plugin/plugin.json');
+    if (claudePlugin) {
+      const cursor = loadJson('.cursor-plugin/plugin.json');
+      if (cursor && cursor.version !== claudePlugin.version) {
+        fail('claude listing: version must stay in lockstep with .cursor-plugin/plugin.json');
+      }
+      const rootPlugin = loadJson('plugin.json');
+      if (rootPlugin && rootPlugin.version !== claudePlugin.version) {
+        fail('claude listing: version must stay in lockstep with plugin.json');
+      }
+    }
+    const expectedRef = typeof claudePlugin?.version === 'string' ? `v${claudePlugin.version}` : null;
+    const extra = pinSourceExtraKey(entry.source);
+    const isUrlPin =
+      entry.source &&
+      entry.source.source === 'url' &&
+      entry.source.url === 'https://github.com/deriv-com/deriv-api-plugin.git' &&
+      entry.source.ref === expectedRef;
+    if (extra && isUrlPin) fail(`.claude-plugin/marketplace.json: extra key "${extra}"`);
+    else if (!isUrlPin) {
+      fail('claude listing: marketplace source must be the url pin at the lockstep version tag');
+    }
   }
 }
 

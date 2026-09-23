@@ -2,7 +2,10 @@
   "mcpServers": {
     "deriv": {
       "type": "http",
-      "url": "https://mcp-api-v2.deriv.com/mcp"
+      "url": "https://mcp-api-v2.deriv.com/mcp",
+      "serverInfo": {
+        "name": "deriv-api"
+      }
     }
   }
 }

@@ -9,7 +9,11 @@
   "plugins": [
     {
       "name": "deriv",
-      "source": "./",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/deriv-com/deriv-api-plugin.git",
+        "ref": "v1.0.4"
+      },
       "displayName": "Deriv",
       "homepage": "https://developers.deriv.com",
       "description": "Live Deriv API schemas, payload validation, and guides for authentication, subscriptions, trades, and errors.",

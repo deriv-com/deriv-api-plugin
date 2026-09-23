@@ -17,8 +17,12 @@ your MCP host  ⟷  Deriv-hosted read-only MCP server  ⟷  developers.deriv.com
   the server, and none is accepted. The plugin does not sign in to Deriv and
   does not collect API tokens. It asks you to configure nothing. There are
   no user Deriv credentials in this plugin.
-  The hosted server's own deployment secrets are never part of the plugin;
-  deployment secrets are not in this repo.
+  The hosted server's own deployment secrets are never part of the plugin.
+  `.mcp.json` records the expected initialize `serverInfo.name`
+  (`deriv-api`). Cursor, Claude Code, and Codex still connect because
+  they do not enforce that field. Deriv checks a captured initialize
+  against it before promoting a release; no host enforces it. A
+  different build that reports the same name still matches.
 - **Hosted server to Deriv docs.** The server fetches from a **single approved
   origin**, `developers.deriv.com`, and no other. It reads public documentation
   and schemas only.

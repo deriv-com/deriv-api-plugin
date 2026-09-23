@@ -54,8 +54,13 @@ ws.onmessage = (e) => {
 ```
 
 ```javascript
-onUserConfirmed(() => ws.send(JSON.stringify({ buy: pendingProposal.id, price: pendingProposal.ask_price })));
+onUserConfirmed(() => {
+  if (!pendingProposal) return;
+  ws.send(JSON.stringify({ buy: pendingProposal.id, price: pendingProposal.ask_price }));
+});
 ```
+
+A proposal id expires. If the stored proposal is stale, request a fresh proposal and put the new id through the same user-confirmation gate before buying from it; never reuse an expired id, and never treat a refresh as pre-confirmed.
 
 ## Bulk purchase (REST, PAT auth — no Bearer)
 
