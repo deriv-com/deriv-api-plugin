@@ -143,10 +143,14 @@ jobs:
         run: |
           set -euo pipefail
           fail() { echo "FAIL: $1" >&2; exit 1; }
-          deletes=$(rsync -a --delete --dry-run --itemize-changes \
+          # The dry-run's own status is checked, not just its output: a dry-run
+          # that died prints nothing, and an empty delete list would otherwise
+          # read as "nothing will be deleted". Only grep's no-match is benign.
+          dry_run=$(rsync -a --delete --dry-run --itemize-changes \
             --exclude '.git' --exclude '.github' \
             --exclude '_staged' --exclude '_incoming' \
-            _staged/ ./ | grep -F '*deleting' || true)
+            _staged/ ./) || fail "rsync --delete dry-run failed (exit $?); the delete guard learned nothing"
+          deletes=$(grep -F '*deleting' <<<"$dry_run" || true)
           if [ -n "$deletes" ]; then
             fail "rsync --delete would remove extra public paths: ${deletes}"
           fi
@@ -154,6 +158,11 @@ jobs:
             --exclude '.git' --exclude '.github' \
             --exclude '_staged' --exclude '_incoming' \
             _staged/ ./
+          # Only publish.yml is copied out of the artifact's .github/: a
+          # promotion run must not replace the verifier that is checking it.
+          # The other .github/ files travel in the artifact and reach this repo
+          # through a reviewed change here instead.
+          [ -f _staged/.github/workflows/publish.yml ] || fail "artifact is missing publish.yml"
           cp _staged/.github/workflows/publish.yml .github/workflows/publish.yml
           git config user.name "deriv-api-plugin-bot"
           git config user.email "api-support@deriv.com"
