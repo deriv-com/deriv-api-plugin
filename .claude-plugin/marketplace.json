@@ -12,7 +12,7 @@
       "source": {
         "source": "url",
         "url": "https://github.com/deriv-com/deriv-api-plugin.git",
-        "ref": "v1.0.4"
+        "ref": "v1.0.5"
       },
       "displayName": "Deriv",
       "homepage": "https://developers.deriv.com",
