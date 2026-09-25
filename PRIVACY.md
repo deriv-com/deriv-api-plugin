@@ -30,25 +30,23 @@ tool-call queries still reach Deriv infrastructure as described above.
 
 ## Analytics
 
-Analytics on the hosted server is **disabled by default**. It is enabled only
-when a PostHog project key is configured on the deployment (via the
-`POSTHOG_PROJECT_API_KEY` environment variable). This document describes both
-states truthfully; whether production runs with analytics enabled is a
-deployment decision.
-
-When analytics is enabled, the server records a per-call event describing which
-tool ran. A `before_send` hook runs before any event leaves the server and
-removes the `payload` and `response` fields of `validate_payload` calls, so the
-JSON payload the agent asked to validate and the validation result are not sent
-to the analytics service.
+Analytics may be collected. The hosted server may send operational events about
+its own calls (which tool ran, how long it took, whether it failed) to a
+third-party analytics service. Tool arguments, responses, and client identity
+are not included.
 
 ## Cache and retention
 
-The hosted server keeps an in-process, per-instance memory cache of the public
-documentation and schemas it fetches, with a stale-on-error fallback so it can
-still answer if the docs host is briefly unreachable. Nothing is written to
-disk, and nothing persists across restarts — when a server instance restarts,
-its cache is empty again.
+The hosted server caches only the shared catalogue documents it fetches: the
+`llms.txt` index, the WebSocket endpoint list, and the REST OpenAPI document.
+It holds them in an in-process, per-instance memory cache with a fifteen-minute
+per-entry lifetime and a stale-on-error fallback, so an expired entry is served
+rather than the call failing when the docs host is briefly unreachable.
+
+Per-endpoint content — a schema, an endpoint page, a published example — is
+never cached; it is fetched on each call. Nothing is written to disk, and
+nothing persists across restarts — when a server instance restarts, its cache
+is empty again.
 
 ## What is not collected by the plugin
 
