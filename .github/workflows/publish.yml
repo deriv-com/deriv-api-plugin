@@ -185,8 +185,8 @@ jobs:
         run: |
           set -euo pipefail
           # CHANGELOG lives under .github/ so the public tree stays exactly the
-          # 13 allowlisted runtime paths + this repo's own .github/ (the
-          # surface guard rejects any other root path).
+          # runtime paths .github/workflows/verify-surface.mjs's ALLOW set lists
+          # + this repo's own .github/ (it rejects any other root path).
           node .github/workflows/update-changelog.mjs "${TAG}" "${NOTES}"
           # Stage first, then diff the index: `git diff --quiet` alone cannot see
           # a brand-new untracked CHANGELOG.md (the first population), so it would

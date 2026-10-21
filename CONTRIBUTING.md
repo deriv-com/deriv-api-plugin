@@ -3,7 +3,10 @@
 Thanks for your interest in improving the Deriv API plugin.
 
 See [`README.md`](README.md) for how to install. Partners install it as
-**deriv**. The Cursor local-clone path is `~/.cursor/plugins/local/deriv`.
+**deriv** — on Cursor from the marketplace listing at
+https://cursor.com/marketplace/deriv with `/add-plugin deriv`. The local clone
+into `~/.cursor/plugins/local/deriv` is the secondary route, for a surface that
+is not yet published.
 
 Contributions are to documentation, manifests, and bundled skills.
 

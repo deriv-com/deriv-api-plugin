@@ -12,10 +12,13 @@
 // Fail-closed checks over the public tree:
 //   1. Surface: every path is an allowlisted runtime path OR under this repo's
 //      own `.github/`. Anything else fails and is named.
-//   2. Presence: SECURITY.md, PRIVACY.md, and .mcp.json must exist
-//      (independent of ALLOW).
-//   3. MCP URL pin: when .mcp.json is present, mcpServers.deriv must be
-//      type "http" at https://mcp-api-v2.deriv.com/mcp. No hostname-pattern gate.
+//   2. Presence: SECURITY.md, PRIVACY.md, and the MCP declaration pair
+//      (.mcp.json and mcp.json) must exist (independent of ALLOW).
+//   3. MCP URL pin: mcpServers.deriv must sit at https://mcp-api-v2.deriv.com/mcp
+//      in both files — type "http" in the vendor-dialect .mcp.json, and
+//      type "streamable-http" under the Agent Plugins v1 $schema in mcp.json.
+//      The two transport spellings are pinned separately, never compared. No
+//      hostname-pattern gate.
 //   4. Content gates: secrets/key material, tooling/planning artefacts, and
 //      local-runtime remnants — any hit fails and is named. (Internal hostname /
 //      repo-name gating is private-side only, per the note above, so this public
@@ -41,6 +44,7 @@ import { execFileSync } from 'node:child_process';
 const ALLOW = new Set([
   'plugin.json',
   '.mcp.json',
+  'mcp.json',
   '.cursor-plugin/plugin.json',
   '.cursor-plugin/marketplace.json',
   '.claude-plugin/plugin.json',
@@ -238,12 +242,22 @@ for (const path of paths) {
 }
 
 // 2. Presence gate.
-for (const file of ['SECURITY.md', 'PRIVACY.md', '.mcp.json']) {
+for (const file of ['SECURITY.md', 'PRIVACY.md', '.mcp.json', 'mcp.json']) {
   if (!existsSync(join(root, file))) fail(`required file missing: ${file}`);
 }
 
 const PRODUCTION_MCP_URL = 'https://mcp-api-v2.deriv.com/mcp';
-// 3. MCP URL pin.
+const STANDARD_MCP_SCHEMA_URL = 'https://agent-plugins.org/schemas/1.0.0/mcp.schema.json';
+// 3. MCP URL pin, over the declaration pair. The two files name the same server
+//    at the same url and differ only in schema and transport spelling: the
+//    vendor dialect Claude Code and Cursor read, and the standard one Codex and
+//    any Agent Plugins v1 host reads. The Codex compatibility manifest's
+//    mcpServers field names ./.mcp.json, but this package is portable: under
+//    OpenAI's package rules (https://developers.openai.com/plugins/deploy/submission)
+//    a portable package's root mcp.json is what OpenAI and Codex discover, and
+//    that field cannot replace it. That matches the measurement on 2026-10-01
+//    with Codex CLI 0.159.2. Both files name the same server at the same url.
+//    The spellings are pinned separately, never compared.
 if (existsSync(join(root, '.mcp.json'))) {
   try {
     const mcp = JSON.parse(readFileSync(join(root, '.mcp.json'), 'utf8'));
@@ -255,6 +269,24 @@ if (existsSync(join(root, '.mcp.json'))) {
     }
   } catch (err) {
     fail(`MCP URL pin: .mcp.json is not valid JSON (${err.message})`);
+  }
+}
+
+if (existsSync(join(root, 'mcp.json'))) {
+  try {
+    const standard = JSON.parse(readFileSync(join(root, 'mcp.json'), 'utf8'));
+    const deriv = standard && standard.mcpServers && standard.mcpServers.deriv;
+    if (!standard || standard.$schema !== STANDARD_MCP_SCHEMA_URL) {
+      fail(`MCP standard pin: mcp.json $schema must be ${STANDARD_MCP_SCHEMA_URL}`);
+    }
+    if (!deriv || deriv.url !== PRODUCTION_MCP_URL) {
+      fail(`MCP standard pin: mcp.json mcpServers.deriv url must be ${PRODUCTION_MCP_URL}`);
+    }
+    if (!deriv || deriv.type !== 'streamable-http') {
+      fail('MCP standard pin: mcp.json mcpServers.deriv type must be "streamable-http"');
+    }
+  } catch (err) {
+    fail(`MCP standard pin: mcp.json is not valid JSON (${err.message})`);
   }
 }
 
@@ -307,8 +339,9 @@ for (const path of paths) {
 }
 
 // 6. Codex listing contract. Official package rules require a relative
-//    branding path (not an HTTPS URL), MCP declared as ./.mcp.json, and
-//    directory-submission length limits on the title and subtitle.
+//    branding path (not an HTTPS URL) and directory-submission length limits on
+//    the title and subtitle. The Codex compatibility manifest declares MCP as
+//    ./.mcp.json, which has no effect in a portable package (see step 3).
 const CODEX_CATEGORIES = new Set([
   'Productivity',
   'Creativity',
@@ -335,6 +368,13 @@ const loadJson = (path) => {
     return null;
   }
 };
+for (const path of ['plugin.json', '.cursor-plugin/plugin.json', '.claude-plugin/plugin.json']) {
+  const manifest = loadJson(path);
+  if (manifest?.extensions && typeof manifest.extensions === 'object' &&
+      !Array.isArray(manifest.extensions) && 'com.openai' in manifest.extensions) {
+    fail(`${path}: "extensions.com.openai" must not appear`);
+  }
+}
 const requireHttps = (label, value) => {
   if (typeof value !== 'string' || !HTTPS.test(value)) {
     fail(`codex listing: ${label} must be an https URL`);
@@ -353,6 +393,43 @@ const requireAsset = (label, value) => {
   if (!existsSync(join(root, rel))) fail(`codex listing: ${label} file missing (${rel})`);
 };
 
+const OPENAI_REVIEW_TOOL_NAMES = new Set([
+  'search_docs',
+  'search_endpoints',
+  'get_schema',
+  'get_field',
+  'validate_payload',
+  'get_example',
+  'get_skill',
+  'guide_api_conventions',
+  'guide_authenticate',
+  'guide_handle_errors',
+  'guide_oauth_app_setup',
+  'guide_place_contract',
+  'guide_rest_vs_websocket',
+  'guide_subscribe_ticks',
+]);
+const OPENAI_POSITIVE_CASE_COUNT = 5;
+const OPENAI_NEGATIVE_CASE_COUNT = 3;
+const OPENAI_SCOPED_BANNED_KEYS = ['apps', 'hooks', 'onboardingSkill'];
+const OPENAI_RECURSIVE_BANNED_KEYS = ['test_credentials', 'reviewer_instructions'];
+const OPENAI_POSITIVE_CASE_TOOL_ORDER = [
+  'search_docs',
+  'search_endpoints',
+  'get_schema',
+  'get_field',
+  'validate_payload',
+];
+
+function jsonHasAppReference(node) {
+  if (typeof node === 'string') return node.includes('.app.json');
+  if (Array.isArray(node)) return node.some(jsonHasAppReference);
+  if (node && typeof node === 'object') {
+    return Object.entries(node).some(([key, value]) => key.includes('.app.json') || jsonHasAppReference(value));
+  }
+  return false;
+}
+
 const codex = loadJson('.codex-plugin/plugin.json');
 if (codex) {
   const iface = codex.interface && typeof codex.interface === 'object' ? codex.interface : null;
@@ -365,11 +442,89 @@ if (codex) {
     fail('codex listing: description is required and must be 1024 characters or fewer');
   }
   if (!codex.author || codex.author.name !== 'deriv') fail('codex listing: author.name must be deriv');
+  // Which file Codex reads instead is explained at step 3.
   if (codex.mcpServers !== './.mcp.json') {
-    fail('codex listing: mcpServers must be ./.mcp.json so the hosted server is imported');
+    fail('codex listing: mcpServers must be ./.mcp.json (Codex reads the root mcp.json)');
   }
   if (codex.skills !== './skills/') fail('codex listing: skills must be ./skills/');
-  if (codex.apps != null) fail('codex listing: apps must be omitted; there is no .app.json');
+  for (const field of OPENAI_SCOPED_BANNED_KEYS) {
+    if (field in codex) {
+      fail(`codex listing: ${field} must be omitted${field === 'apps' ? '; there is no .app.json' : ''}`);
+    }
+  }
+  const jsonHasKey = (node, key) => {
+    if (Array.isArray(node)) return node.some((item) => jsonHasKey(item, key));
+    if (node && typeof node === 'object') {
+      if (Object.prototype.hasOwnProperty.call(node, key)) return true;
+      return Object.values(node).some((value) => jsonHasKey(value, key));
+    }
+    return false;
+  };
+  for (const field of OPENAI_RECURSIVE_BANNED_KEYS) {
+    if (jsonHasKey(codex, field)) {
+      fail(`codex listing: ${field} must not appear`);
+    }
+  }
+  if (jsonHasAppReference(codex)) fail('codex listing: .app.json references must not appear');
+
+  const openai = codex.extensions?.['com.openai'];
+  if (!openai || typeof openai !== 'object' || Array.isArray(openai)) {
+    fail('codex listing: extensions.com.openai must be a non-array object');
+  } else {
+    for (const field of OPENAI_SCOPED_BANNED_KEYS) {
+      if (field in openai) fail(`codex listing: extensions.com.openai.${field} must be omitted`);
+    }
+    const review = openai.review;
+    if (!review || typeof review !== 'object' || Array.isArray(review)) {
+      fail('codex listing: extensions.com.openai.review must be an object');
+    } else {
+      if (review.commerce !== false) fail('codex listing: review.commerce must be false');
+      if (typeof review.commerce_description !== 'string' || !review.commerce_description.trim()) {
+        fail('codex listing: review.commerce_description must be a non-empty string');
+      }
+      if ('demo_recording_url' in review) fail('codex listing: review.demo_recording_url must be absent');
+      const positive = review.test_cases?.positive;
+      const negative = review.test_cases?.negative;
+      if (!Array.isArray(positive) || positive.length !== OPENAI_POSITIVE_CASE_COUNT) {
+        fail(`codex listing: review.test_cases.positive must be an array of length ${OPENAI_POSITIVE_CASE_COUNT}`);
+      } else {
+        positive.forEach((c, i) => {
+          for (const field of ['description', 'prompt', 'tools_triggered', 'expected_behavior']) {
+            if (typeof c?.[field] !== 'string' || !c[field].trim()) {
+              fail(`codex listing: positive[${i}].${field} must be a non-empty string`);
+            }
+          }
+          if (typeof c?.tools_triggered === 'string') {
+            const tokens = c.tools_triggered.split(',').map((t) => t.trim());
+            for (const token of tokens) {
+              if (token.includes('__') || token.startsWith('plugin-')) {
+                fail('codex listing: tools_triggered must use a bare tool name');
+              } else if (!OPENAI_REVIEW_TOOL_NAMES.has(token)) {
+                fail('codex listing: tools_triggered token is not a permitted bare name');
+              }
+            }
+            if (tokens.length !== 1 || tokens[0] !== OPENAI_POSITIVE_CASE_TOOL_ORDER[i]) {
+              fail(`codex listing: positive[${i}].tools_triggered must be exactly ${OPENAI_POSITIVE_CASE_TOOL_ORDER[i]}`);
+            }
+          }
+        });
+      }
+      if (!Array.isArray(negative) || negative.length !== OPENAI_NEGATIVE_CASE_COUNT) {
+        fail(`codex listing: review.test_cases.negative must be an array of length ${OPENAI_NEGATIVE_CASE_COUNT}`);
+      } else {
+        negative.forEach((c, i) => {
+          for (const field of ['description', 'prompt']) {
+            if (typeof c?.[field] !== 'string' || !c[field].trim()) {
+              fail(`codex listing: negative[${i}].${field} must be a non-empty string`);
+            }
+          }
+        });
+      }
+    }
+    if (typeof openai.publication?.release_notes !== 'string' || !openai.publication.release_notes.trim()) {
+      fail('codex listing: publication.release_notes must be a non-empty string');
+    }
+  }
   if (iface) {
     if (iface.developerName !== codex.author.name) {
       fail('codex listing: interface.developerName must match author.name');
@@ -411,6 +566,7 @@ if (codex) {
       if (seen.has(key)) fail('codex listing: defaultPrompt entries must be unique');
       seen.add(key);
     }
+    if ('screenshots' in iface) fail('codex listing: interface.screenshots must be absent');
   }
   const cursor = loadJson('.cursor-plugin/plugin.json');
   if (cursor && cursor.version !== codex.version) {

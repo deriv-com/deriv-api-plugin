@@ -1,59 +1,47 @@
 # Privacy
 
-This document describes what data the Deriv API plugin does and does not handle.
+The Deriv API plugin is provided by Deriv. [Deriv's Privacy Policy](https://deriv.com/privacy-policy)
+applies to personal data processed through the plugin. It describes the categories of data Deriv
+collects, why, who receives it, how long it is kept, and your rights. This page summarises what
+applies to the plugin.
 
-## Data flow
+## What the plugin processes
 
-When one of its tools is called, the request is sent to the Deriv-hosted MCP
-server whose URL is declared in `.mcp.json`, and that hosted server is what
-fetches public Deriv API documentation and schemas from the Deriv developer docs
-host. Your queries therefore reach Deriv infrastructure — they are not answered
-entirely within the MCP host.
+When your AI assistant calls one of the plugin's tools, the request goes to the Deriv-hosted MCP
+server the plugin declares. Deriv may process:
 
-What reaches the Deriv-hosted server on each call is:
+- **Tool inputs:** the tool name and its arguments, such as search terms, endpoint names and field
+  paths, and for `validate_payload`, the JSON payload the agent asked to validate.
+- **Technical data:** such as the client IP address, user agent, and request times.
+- **Usage data:** such as which tools were called, how long they took, and whether they failed.
 
-- **The tool name and its arguments.** Depending on the tool, the arguments
-  include endpoint ids, field paths, and free-text search terms. For
-  `validate_payload`, the argument is the JSON payload the agent asked to
-  validate.
-- **Transport-level metadata.** As with any HTTP request, the connection carries
-  metadata such as the client IP address and user agent, which are subject to
-  standard HTTP access logging on the server side.
+Some of this information may be kept in service logs and analytics records.
 
-The plugin does not add any account, profile, or credential to these requests —
-what it sends is the tool call the agent made, and nothing more.
+The plugin also ships skill files that your assistant reads from your own machine. Reading them
+sends nothing to Deriv. When the hosted server is unavailable, those skills may direct your
+assistant to Deriv's public documentation at developers.deriv.com.
 
-When the hosted MCP is down, the bundled skill files that ship with the plugin
-are read locally on the developer's machine. That local read is not a tool call:
-it does not send those queries to the Deriv-hosted server. When MCP is used,
-tool-call queries still reach Deriv infrastructure as described above.
+## How it is used and shared
 
-## Analytics
+Deriv uses this data to answer tool requests, to operate and secure the service, to fix problems, and
+to understand and improve how the plugin is used. It may be processed by Deriv's hosting, network,
+security, and analytics providers, and within the Deriv group, as described in the Privacy Policy.
 
-Analytics may be collected. The hosted server may send operational events about
-its own calls (which tool ran, how long it took, whether it failed) to a
-third-party analytics service. Tool arguments, responses, and client identity
-are not included.
+## Retention and your choices
 
-## Cache and retention
+How long data is kept, and the rights you have, are set out in Deriv's Privacy Policy. You can stop
+the plugin sending requests at any time by disabling or uninstalling it.
 
-The hosted server caches only the shared catalogue documents it fetches: the
-`llms.txt` index, the WebSocket endpoint list, and the REST OpenAPI document.
-It holds them in an in-process, per-instance memory cache with a fifteen-minute
-per-entry lifetime and a stale-on-error fallback, so an expired entry is served
-rather than the call failing when the docs host is briefly unreachable.
+## Credentials
 
-Per-endpoint content — a schema, an endpoint page, a published example — is
-never cached; it is fetched on each call. Nothing is written to disk, and
-nothing persists across restarts — when a server instance restarts, its cache
-is empty again.
+The plugin does not ask for your Deriv account credentials or API tokens. Do not include credentials
+or other personal data in tool inputs.
 
-## What is not collected by the plugin
+## Your AI host
 
-- The plugin **stores no credentials** and requires none.
-- The plugin collects **no personal data**.
+Your AI host (for example ChatGPT, Codex, Claude Code, or Cursor) may collect its own data about tool
+use under its own privacy terms, independent of this plugin.
 
-There is no account and no profile. Note, however, that your own MCP host
-(Cursor or Claude Code) may add its own telemetry about tool usage, independent
-of this plugin; that is governed by your host's own privacy terms, not this
-document.
+## Contact
+
+For privacy questions or requests, contact Deriv's Data Protection Officer at dpo@deriv.com.

@@ -14,9 +14,11 @@
 # Checks, all FAIL CLOSED:
 #   1. Surface: every tracked path is an allowlisted runtime path OR under this
 #      repo's own .github/. Anything else fails and is named.
-#   2. Presence: SECURITY.md, PRIVACY.md, and .mcp.json must exist.
-#   3. MCP URL pin: mcpServers.deriv is type "http" at
-#      https://mcp-api-v2.deriv.com/mcp.
+#   2. Presence: SECURITY.md, PRIVACY.md, and the MCP declaration pair
+#      (.mcp.json and mcp.json) must exist.
+#   3. MCP URL pin: mcpServers.deriv sits at https://mcp-api-v2.deriv.com/mcp
+#      in both files — type "http" in the vendor-dialect .mcp.json, and
+#      type "streamable-http" under the Agent Plugins v1 $schema in mcp.json.
 #   4. Content gates: secrets, tooling/planning artefacts, local-runtime
 #      remnants. No internal-hostnames gate on this public checker.
 #   5. Internal-reference scan over .github/.
