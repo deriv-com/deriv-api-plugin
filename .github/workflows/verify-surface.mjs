@@ -251,8 +251,13 @@ const STANDARD_MCP_SCHEMA_URL = 'https://agent-plugins.org/schemas/1.0.0/mcp.sch
 // 3. MCP URL pin, over the declaration pair. The two files name the same server
 //    at the same url and differ only in schema and transport spelling: the
 //    vendor dialect Claude Code and Cursor read, and the standard one Codex and
-//    any Agent Plugins v1 host reads. The spellings are pinned separately,
-//    never compared.
+//    any Agent Plugins v1 host reads. The Codex compatibility manifest's
+//    mcpServers field names ./.mcp.json, but this package is portable: under
+//    OpenAI's package rules (https://developers.openai.com/plugins/deploy/submission)
+//    a portable package's root mcp.json is what OpenAI and Codex discover, and
+//    that field cannot replace it. That matches the measurement on 2026-10-01
+//    with Codex CLI 0.159.2. Both files name the same server at the same url.
+//    The spellings are pinned separately, never compared.
 if (existsSync(join(root, '.mcp.json'))) {
   try {
     const mcp = JSON.parse(readFileSync(join(root, '.mcp.json'), 'utf8'));
@@ -334,8 +339,9 @@ for (const path of paths) {
 }
 
 // 6. Codex listing contract. Official package rules require a relative
-//    branding path (not an HTTPS URL), MCP declared as ./.mcp.json, and
-//    directory-submission length limits on the title and subtitle.
+//    branding path (not an HTTPS URL) and directory-submission length limits on
+//    the title and subtitle. The Codex compatibility manifest declares MCP as
+//    ./.mcp.json, which has no effect in a portable package (see step 3).
 const CODEX_CATEGORIES = new Set([
   'Productivity',
   'Creativity',
@@ -436,8 +442,9 @@ if (codex) {
     fail('codex listing: description is required and must be 1024 characters or fewer');
   }
   if (!codex.author || codex.author.name !== 'deriv') fail('codex listing: author.name must be deriv');
+  // Which file Codex reads instead is explained at step 3.
   if (codex.mcpServers !== './.mcp.json') {
-    fail('codex listing: mcpServers must be ./.mcp.json so the hosted server is imported');
+    fail('codex listing: mcpServers must be ./.mcp.json (Codex reads the root mcp.json)');
   }
   if (codex.skills !== './skills/') fail('codex listing: skills must be ./skills/');
   for (const field of OPENAI_SCOPED_BANNED_KEYS) {

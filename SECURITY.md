@@ -14,8 +14,13 @@ your MCP host  ⟷  Deriv-hosted read-only MCP server  ⟷  developers.deriv.com
 - **Client to hosted server.** The MCP host connects to the Deriv-hosted MCP
   server over **HTTPS**. Its URL is declared at the plugin root in both
   `.mcp.json` (read by Cursor and Claude Code) and `mcp.json` (read by an Agent
-  Plugins v1 host); Codex reads the root `mcp.json`, and the two name the same
-  server at the same URL. The connection is
+  Plugins v1 host). Codex reads the root `mcp.json`. The Codex compatibility
+  manifest's `mcpServers` field names `./.mcp.json`, but this is a portable
+  package, and under [OpenAI's package rules](https://developers.openai.com/plugins/deploy/submission)
+  a portable package's root `mcp.json` is what OpenAI and Codex discover; that
+  field cannot replace it. That matches what we measured on 2026-10-01 with
+  Codex CLI 0.159.2. Both files name the same server at the same URL. The
+  connection is
   **unauthenticated and credential-free**: no authentication is required to call
   the server, and none is accepted. The plugin does not sign in to Deriv and
   does not collect API tokens. It asks you to configure nothing. There are

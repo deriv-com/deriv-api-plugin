@@ -106,7 +106,12 @@ The server is declared twice at the plugin root, for the same key at the same
 URL: `.mcp.json` (`type: "http"`) is what Cursor and Claude Code read, and
 `mcp.json` (`type: "streamable-http"`, under the Agent Plugins v1 schema) is
 what a host following that standard reads. Codex reads the root `mcp.json`.
-Whichever one your host loads, it reaches the same server.
+The Codex compatibility manifest's `mcpServers` field names `./.mcp.json`, but
+this is a portable package, and under
+[OpenAI's package rules](https://developers.openai.com/plugins/deploy/submission) a portable
+package's root `mcp.json` is what OpenAI and Codex discover; that field cannot
+replace it. That matches what we measured on 2026-10-01 with Codex CLI 0.159.2.
+Both files name the same server at the same URL.
 
 ## Usage
 
