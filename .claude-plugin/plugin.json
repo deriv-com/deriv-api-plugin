@@ -1,11 +1,15 @@
 {
   "name": "deriv",
   "displayName": "Deriv",
-  "version": "1.0.5",
+  "version": "1.0.9",
   "description": "Live Deriv API schemas, payload validation, and guides for authentication, subscriptions, trades, and errors.",
   "author": { "name": "Deriv", "email": "api-support@deriv.com" },
   "homepage": "https://developers.deriv.com",
   "repository": "https://github.com/deriv-com/deriv-api-plugin",
   "license": "MIT",
-  "logo": "https://raw.githubusercontent.com/deriv-com/deriv-api-plugin/master/assets/logo.png"
+  "icon": "./assets/logo.png",
+  "privacyPolicyUrl": "https://deriv.com/privacy-policy",
+  "supportUrl": "https://github.com/deriv-com/deriv-api-plugin/issues",
+  "termsOfServiceUrl": "https://github.com/deriv-com/deriv-api-plugin/blob/master/LICENSE",
+  "documentationUrl": "https://developers.deriv.com"
 }

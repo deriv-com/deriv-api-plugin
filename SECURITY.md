@@ -12,7 +12,10 @@ your MCP host  ⟷  Deriv-hosted read-only MCP server  ⟷  developers.deriv.com
 ```
 
 - **Client to hosted server.** The MCP host connects to the Deriv-hosted MCP
-  server whose URL is declared in `.mcp.json` over **HTTPS**. The connection is
+  server over **HTTPS**. Its URL is declared at the plugin root in both
+  `.mcp.json` (read by Cursor and Claude Code) and `mcp.json` (read by an Agent
+  Plugins v1 host); Codex reads the root `mcp.json`, and the two name the same
+  server at the same URL. The connection is
   **unauthenticated and credential-free**: no authentication is required to call
   the server, and none is accepted. The plugin does not sign in to Deriv and
   does not collect API tokens. It asks you to configure nothing. There are

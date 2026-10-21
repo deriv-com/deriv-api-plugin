@@ -21,8 +21,15 @@ Claude Code may still prompt per tool call.
 
 ### Cursor
 
-Cursor's own marketplace/URL import is available to **Teams and Enterprise** only;
-individual users cannot add this plugin through a Cursor marketplace by URL.
+The plugin is listed on the Cursor Marketplace at
+https://cursor.com/marketplace/deriv. Install it from there:
+
+```
+/add-plugin deriv
+```
+
+As a secondary option — to try a surface that is not yet published to the
+marketplace — clone the public repository into Cursor's local plugin directory:
 
 ```
 git clone https://github.com/deriv-com/deriv-api-plugin ~/.cursor/plugins/local/deriv
@@ -95,6 +102,12 @@ If the plugin is already installed on that host, do not also copy skills or run
 | --- | --- | --- |
 | `deriv` | `https://mcp-api-v2.deriv.com/mcp` | Live schemas, field facts, payload validation, and task guides |
 
+The server is declared twice at the plugin root, for the same key at the same
+URL: `.mcp.json` (`type: "http"`) is what Cursor and Claude Code read, and
+`mcp.json` (`type: "streamable-http"`, under the Agent Plugins v1 schema) is
+what a host following that standard reads. Codex reads the root `mcp.json`.
+Whichever one your host loads, it reaches the same server.
+
 ## Usage
 
 Once installed, the plugin's MCP tools, the Cursor rule, and the bundled skills
@@ -111,5 +124,5 @@ application supplies its own credentials.
 
 - [`CONTRIBUTING.md`](CONTRIBUTING.md) — how to file issues and open pull requests.
 - [`SECURITY.md`](SECURITY.md) — network scope, credential handling, and how to report a vulnerability.
-- [`PRIVACY.md`](PRIVACY.md) — what data flows where, and what is not collected.
+- [`PRIVACY.md`](PRIVACY.md) — what data the plugin processes, and the Deriv Privacy Policy that applies.
 - [`LICENSE`](LICENSE) — MIT.
