@@ -357,7 +357,6 @@ const CODEX_CATEGORIES = new Set([
   'Entertainment',
   'Other',
 ]);
-const HTTPS = /^https:\/\/[^/\s]+/;
 const HEX = /^#[0-9A-Fa-f]{6}$/;
 const SEMVER = /^\d+\.\d+\.\d+$/;
 const loadJson = (path) => {
@@ -376,7 +375,7 @@ for (const path of ['plugin.json', '.cursor-plugin/plugin.json', '.claude-plugin
   }
 }
 const requireHttps = (label, value) => {
-  if (typeof value !== 'string' || !HTTPS.test(value)) {
+  if (!isHttpsUrl(value)) {
     fail(`codex listing: ${label} must be an https URL`);
   }
 };
@@ -428,6 +427,15 @@ function jsonHasAppReference(node) {
     return Object.entries(node).some(([key, value]) => key.includes('.app.json') || jsonHasAppReference(value));
   }
   return false;
+}
+
+function isHttpsUrl(value) {
+  if (typeof value !== 'string' || value !== value.trim() || !/^https:\/\/[^/\s]+/.test(value)) return false;
+  try {
+    return new URL(value).protocol === 'https:';
+  } catch {
+    return false;
+  }
 }
 
 const codex = loadJson('.codex-plugin/plugin.json');
@@ -482,7 +490,7 @@ if (codex) {
       if (typeof review.commerce_description !== 'string' || !review.commerce_description.trim()) {
         fail('codex listing: review.commerce_description must be a non-empty string');
       }
-      if ('demo_recording_url' in review) fail('codex listing: review.demo_recording_url must be absent');
+      if ('demo_recording_url' in review) requireHttps('review.demo_recording_url', review.demo_recording_url);
       const positive = review.test_cases?.positive;
       const negative = review.test_cases?.negative;
       if (!Array.isArray(positive) || positive.length !== OPENAI_POSITIVE_CASE_COUNT) {
