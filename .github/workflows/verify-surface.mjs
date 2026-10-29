@@ -12,13 +12,16 @@
 // Fail-closed checks over the public tree:
 //   1. Surface: every path is an allowlisted runtime path OR under this repo's
 //      own `.github/`. Anything else fails and is named.
-//   2. Presence: SECURITY.md, PRIVACY.md, and the MCP declaration pair
-//      (.mcp.json and mcp.json) must exist (independent of ALLOW).
+//   2. Presence: SECURITY.md, PRIVACY.md, the MCP declaration pair
+//      (.mcp.json and mcp.json), the Antigravity and Kimi declarations
+//      (mcp_config.json and kimi.plugin.json), and the Antigravity manifest
+//      must exist (independent of ALLOW).
 //   3. MCP URL pin: mcpServers.deriv must sit at https://mcp-api-v2.deriv.com/mcp
 //      in both files — type "http" in the vendor-dialect .mcp.json, and
 //      type "streamable-http" under the Agent Plugins v1 $schema in mcp.json.
-//      The two transport spellings are pinned separately, never compared. No
-//      hostname-pattern gate.
+//      The two transport spellings are pinned separately, never compared. The
+//      same url is pinned as serverUrl in mcp_config.json (MCP Antigravity pin)
+//      and as url in kimi.plugin.json (MCP Kimi pin). No hostname-pattern gate.
 //   4. Content gates: secrets/key material, tooling/planning artefacts, and
 //      local-runtime remnants — any hit fails and is named. (Internal hostname /
 //      repo-name gating is private-side only, per the note above, so this public
@@ -26,7 +29,7 @@
 //      exempt from the content grep (it carries the gate patterns themselves and
 //      automation tokens); it is covered by the surface check instead.
 //   5. Internal-reference scan over this repo's own `.github/` machinery.
-//   6. Codex listing contract.
+//   6. Codex listing contract (see the step-6 comment below).
 //
 // File source (two modes):
 //   - default: the committed tree via `git ls-files` (public-repo CI).
@@ -45,13 +48,17 @@ const ALLOW = new Set([
   'plugin.json',
   '.mcp.json',
   'mcp.json',
+  'mcp_config.json',
+  'kimi.plugin.json',
   '.cursor-plugin/plugin.json',
   '.cursor-plugin/marketplace.json',
   '.claude-plugin/plugin.json',
   '.claude-plugin/marketplace.json',
   '.codex-plugin/plugin.json',
   '.agents/plugins/marketplace.json',
+  '.antigravity-plugin/plugin.json',
   'rules/deriv-api-conventions.mdc',
+  'rules/deriv-api-conventions.md',
   'assets/logo.png',
   'assets/logo-dark.png',
   'LICENSE',
@@ -242,51 +249,85 @@ for (const path of paths) {
 }
 
 // 2. Presence gate.
-for (const file of ['SECURITY.md', 'PRIVACY.md', '.mcp.json', 'mcp.json']) {
+const REQUIRED_FILES = [
+  'SECURITY.md',
+  'PRIVACY.md',
+  '.mcp.json',
+  'mcp.json',
+  'mcp_config.json',
+  'kimi.plugin.json',
+  '.antigravity-plugin/plugin.json',
+];
+for (const file of REQUIRED_FILES) {
   if (!existsSync(join(root, file))) fail(`required file missing: ${file}`);
+}
+
+/** Parse `path`, failing under `label` when it is not JSON; undefined on failure. */
+function loadJson(label, path) {
+  // The presence gate already reported a missing required file.
+  if (REQUIRED_FILES.includes(path) && !existsSync(join(root, path))) return undefined;
+  try {
+    return JSON.parse(readFileSync(join(root, path), 'utf8'));
+  } catch (err) {
+    fail(`${label}: ${path} is not valid JSON (${err.message})`);
+    return undefined;
+  }
 }
 
 const PRODUCTION_MCP_URL = 'https://mcp-api-v2.deriv.com/mcp';
 const STANDARD_MCP_SCHEMA_URL = 'https://agent-plugins.org/schemas/1.0.0/mcp.schema.json';
-// 3. MCP URL pin, over the declaration pair. The two files name the same server
-//    at the same url and differ only in schema and transport spelling: the
-//    vendor dialect Claude Code and Cursor read, and the standard one Codex and
-//    any Agent Plugins v1 host reads. The Codex compatibility manifest's
-//    mcpServers field names ./.mcp.json, but this package is portable: under
-//    OpenAI's package rules (https://developers.openai.com/plugins/deploy/submission)
-//    a portable package's root mcp.json is what OpenAI and Codex discover, and
-//    that field cannot replace it. That matches the measurement on 2026-10-01
-//    with Codex CLI 0.159.2. Both files name the same server at the same url.
-//    The spellings are pinned separately, never compared.
-if (existsSync(join(root, '.mcp.json'))) {
-  try {
-    const mcp = JSON.parse(readFileSync(join(root, '.mcp.json'), 'utf8'));
-    const deriv = mcp && mcp.mcpServers && mcp.mcpServers.deriv;
-    if (!deriv || deriv.type !== 'http' || deriv.url !== PRODUCTION_MCP_URL) {
-      fail(
-        `MCP URL pin: mcpServers.deriv must have type "http" and url ${PRODUCTION_MCP_URL}`,
-      );
-    }
-  } catch (err) {
-    fail(`MCP URL pin: .mcp.json is not valid JSON (${err.message})`);
+// 3. MCP URL pin, over the declaration pair. The two files differ only in
+//    schema and transport spelling: the vendor dialect Claude Code and Cursor
+//    read, and the standard one any Agent Plugins v1 host reads. Codex reads
+//    the root mcp.json. The Codex compatibility manifest's mcpServers field
+//    names ./.mcp.json, but this package is portable: under OpenAI's package
+//    rules (https://developers.openai.com/plugins/deploy/submission) a portable
+//    package's root mcp.json is what OpenAI discovers, and that field cannot
+//    replace it. That matches the measurement on 2026-10-01 with Codex CLI
+//    0.159.2. Both files name the same server at the same URL. The spellings
+//    are pinned separately, never compared.
+
+/** Parse an MCP declaration, failing under `label` when it is not JSON; null when absent or invalid. */
+function readMcpDeclaration(label, path) {
+  const file = loadJson(label, path);
+  return file === undefined ? null : { file, deriv: file && file.mcpServers && file.mcpServers.deriv };
+}
+
+const vendorMcp = readMcpDeclaration('MCP URL pin', '.mcp.json');
+if (vendorMcp) {
+  const { deriv } = vendorMcp;
+  if (!deriv || deriv.type !== 'http' || deriv.url !== PRODUCTION_MCP_URL) {
+    fail(
+      `MCP URL pin: mcpServers.deriv must have type "http" and url ${PRODUCTION_MCP_URL}`,
+    );
   }
 }
 
-if (existsSync(join(root, 'mcp.json'))) {
-  try {
-    const standard = JSON.parse(readFileSync(join(root, 'mcp.json'), 'utf8'));
-    const deriv = standard && standard.mcpServers && standard.mcpServers.deriv;
-    if (!standard || standard.$schema !== STANDARD_MCP_SCHEMA_URL) {
-      fail(`MCP standard pin: mcp.json $schema must be ${STANDARD_MCP_SCHEMA_URL}`);
-    }
-    if (!deriv || deriv.url !== PRODUCTION_MCP_URL) {
-      fail(`MCP standard pin: mcp.json mcpServers.deriv url must be ${PRODUCTION_MCP_URL}`);
-    }
-    if (!deriv || deriv.type !== 'streamable-http') {
-      fail('MCP standard pin: mcp.json mcpServers.deriv type must be "streamable-http"');
-    }
-  } catch (err) {
-    fail(`MCP standard pin: mcp.json is not valid JSON (${err.message})`);
+const standardMcp = readMcpDeclaration('MCP standard pin', 'mcp.json');
+if (standardMcp) {
+  const { file: standard, deriv } = standardMcp;
+  if (!standard || standard.$schema !== STANDARD_MCP_SCHEMA_URL) {
+    fail(`MCP standard pin: mcp.json $schema must be ${STANDARD_MCP_SCHEMA_URL}`);
+  }
+  if (!deriv || deriv.url !== PRODUCTION_MCP_URL) {
+    fail(`MCP standard pin: mcp.json mcpServers.deriv url must be ${PRODUCTION_MCP_URL}`);
+  }
+  if (!deriv || deriv.type !== 'streamable-http') {
+    fail('MCP standard pin: mcp.json mcpServers.deriv type must be "streamable-http"');
+  }
+}
+
+// Antigravity reads mcp_config.json (serverUrl) and Kimi reads the inline
+// mcpServers in kimi.plugin.json (url); neither host reads the pair above.
+const hostDeclarations = new Map();
+for (const [label, path, urlKey] of [
+  ['MCP Antigravity pin', 'mcp_config.json', 'serverUrl'],
+  ['MCP Kimi pin', 'kimi.plugin.json', 'url'],
+]) {
+  const declaration = readMcpDeclaration(label, path);
+  hostDeclarations.set(path, declaration);
+  if (declaration && (!declaration.deriv || declaration.deriv[urlKey] !== PRODUCTION_MCP_URL)) {
+    fail(`${label}: ${path} mcpServers.deriv ${urlKey} must be ${PRODUCTION_MCP_URL}`);
   }
 }
 
@@ -338,10 +379,66 @@ for (const path of paths) {
   }
 }
 
-// 6. Codex listing contract. Official package rules require a relative
-//    branding path (not an HTTPS URL) and directory-submission length limits on
-//    the title and subtitle. The Codex compatibility manifest declares MCP as
-//    ./.mcp.json, which has no effect in a portable package (see step 3).
+// 6. Codex listing contract. Every rule this step enforces:
+//    - Every manifest it reads must be valid JSON, and extensions.com.openai
+//      must be absent from the root, Cursor and Claude Code manifests.
+//    - The interface object is required. name and author.name must be deriv,
+//      and interface.developerName must match author.name. version must be
+//      semver. skills must be ./skills/.
+//    - description is required, at most 1024 characters.
+//    - mcpServers: the Codex compatibility manifest declares MCP as
+//      ./.mcp.json, which has no effect in a portable package (see step 3).
+//    - apps, hooks and onboardingSkill (OPENAI_SCOPED_BANNED_KEYS) are banned at
+//      the Codex top level and directly under extensions.com.openai, whatever
+//      their value.
+//    - test_credentials and reviewer_instructions (OPENAI_RECURSIVE_BANNED_KEYS)
+//      are banned anywhere in the Codex manifest, nested objects and arrays
+//      included.
+//    - .app.json references are banned in any key or string value.
+//    - extensions.com.openai must be a non-array object, and
+//      extensions.com.openai.review must be an object.
+//    - review.commerce is exactly false, and review.commerce_description is
+//      non-empty.
+//    - review.test_cases.positive and review.test_cases.negative hold exactly
+//      OPENAI_POSITIVE_CASE_COUNT and OPENAI_NEGATIVE_CASE_COUNT cases.
+//      positive[i].description, positive[i].prompt, positive[i].tools_triggered
+//      and positive[i].expected_behavior are non-empty, and so are
+//      negative[i].description, negative[i].prompt and
+//      negative[i].expected_behavior.
+//    - tools_triggered takes bare names only, never a __ or plugin- namespaced
+//      one, and each tools_triggered token must be in OPENAI_REVIEW_TOOL_NAMES.
+//      Each positive[i].tools_triggered is exactly the entry at i in
+//      OPENAI_POSITIVE_CASE_TOOL_ORDER.
+//    - review.demo_recording_url is optional; when present it must be a strict
+//      https URL.
+//    - publication.release_notes is non-empty.
+//    - displayName, the title, is non-empty, at most 30 characters, and
+//      shortDescription, the subtitle, is one line, non-empty, at most 30
+//      characters: the directory-submission limits. longDescription is required, at most 4000
+//      characters. category must be in CODEX_CATEGORIES.
+//    - capabilities is a list of 1 to 20 entries.
+//    - brandColor is a six-digit hex colour.
+//    - defaultPrompt holds 1 to 3 entries; each defaultPrompt is one line of
+//      at most 128 characters with no @ mentions, and defaultPrompt entries
+//      must be unique.
+//    - interface.screenshots must be absent.
+//    - homepage, author.url, interface.websiteURL, interface.privacyPolicyURL,
+//      interface.termsOfServiceURL and interface.supportURL are strict https
+//      URLs.
+//    - interface.logo, interface.logoDark and interface.composerIcon are
+//      ./-relative paths to files that exist, never URLs, as official package
+//      rules require.
+//    - version stays in lockstep across plugin.json, .cursor-plugin/plugin.json,
+//      .codex-plugin/plugin.json, .claude-plugin/plugin.json, kimi.plugin.json
+//      and .antigravity-plugin/plugin.json.
+//    - The Codex marketplace declares one plugin entry: the marketplace plugin
+//      name is deriv, the marketplace source is the url pin at the lockstep
+//      version tag with no extra keys, the marketplace policy is AVAILABLE /
+//      ON_INSTALL, and the marketplace category is Developer Tools.
+//    - The Claude marketplace declares one plugin entry whose marketplace source
+//      is the same url pin, with no extra keys.
+//    - .antigravity-plugin/plugin.json carries no mcpServers, which would
+//      override mcp_config.json.
 const CODEX_CATEGORIES = new Set([
   'Productivity',
   'Creativity',
@@ -359,21 +456,40 @@ const CODEX_CATEGORIES = new Set([
 ]);
 const HEX = /^#[0-9A-Fa-f]{6}$/;
 const SEMVER = /^\d+\.\d+\.\d+$/;
-const loadJson = (path) => {
-  try {
-    return JSON.parse(readFileSync(join(root, path), 'utf8'));
-  } catch (err) {
-    fail(`codex listing: ${path} is not valid JSON (${err.message})`);
-    return null;
-  }
-};
-for (const path of ['plugin.json', '.cursor-plugin/plugin.json', '.claude-plugin/plugin.json']) {
-  const manifest = loadJson(path);
+const HTTPS_PREFIX = /^https:\/\/[^/\s]+/;
+const rootPlugin = loadJson('root listing', 'plugin.json');
+const cursorPlugin = loadJson('cursor listing', '.cursor-plugin/plugin.json');
+const claudePlugin = loadJson('claude listing', '.claude-plugin/plugin.json');
+for (const [path, manifest] of [
+  ['plugin.json', rootPlugin],
+  ['.cursor-plugin/plugin.json', cursorPlugin],
+  ['.claude-plugin/plugin.json', claudePlugin],
+]) {
   if (manifest?.extensions && typeof manifest.extensions === 'object' &&
       !Array.isArray(manifest.extensions) && 'com.openai' in manifest.extensions) {
     fail(`${path}: "extensions.com.openai" must not appear`);
   }
 }
+
+/** Fail under `listing` when `manifest.version` differs from the root or Cursor manifest. */
+function checkVersionLockstep(listing, manifest) {
+  if (cursorPlugin && cursorPlugin.version !== manifest.version) {
+    fail(`${listing}: version must stay in lockstep with .cursor-plugin/plugin.json`);
+  }
+  if (rootPlugin && rootPlugin.version !== manifest.version) {
+    fail(`${listing}: version must stay in lockstep with plugin.json`);
+  }
+}
+
+function isHttpsUrl(value) {
+  if (typeof value !== 'string' || value !== value.trim() || !HTTPS_PREFIX.test(value)) return false;
+  try {
+    return new URL(value).protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
 const requireHttps = (label, value) => {
   if (!isHttpsUrl(value)) {
     fail(`codex listing: ${label} must be an https URL`);
@@ -410,7 +526,9 @@ const OPENAI_REVIEW_TOOL_NAMES = new Set([
 ]);
 const OPENAI_POSITIVE_CASE_COUNT = 5;
 const OPENAI_NEGATIVE_CASE_COUNT = 3;
+// Banned at the Codex top level and directly under extensions.com.openai.
 const OPENAI_SCOPED_BANNED_KEYS = ['apps', 'hooks', 'onboardingSkill'];
+// Banned anywhere in the Codex manifest.
 const OPENAI_RECURSIVE_BANNED_KEYS = ['test_credentials', 'reviewer_instructions'];
 const OPENAI_POSITIVE_CASE_TOOL_ORDER = [
   'search_docs',
@@ -420,25 +538,18 @@ const OPENAI_POSITIVE_CASE_TOOL_ORDER = [
   'validate_payload',
 ];
 
-function jsonHasAppReference(node) {
-  if (typeof node === 'string') return node.includes('.app.json');
-  if (Array.isArray(node)) return node.some(jsonHasAppReference);
+function jsonSome(node, match) {
+  // Visits every object key (isKey true) and every string value (isKey false),
+  // stopping at the first match that returns true.
+  if (typeof node === 'string') return match(node, false);
+  if (Array.isArray(node)) return node.some((item) => jsonSome(item, match));
   if (node && typeof node === 'object') {
-    return Object.entries(node).some(([key, value]) => key.includes('.app.json') || jsonHasAppReference(value));
+    return Object.entries(node).some(([key, value]) => match(key, true) || jsonSome(value, match));
   }
   return false;
 }
 
-function isHttpsUrl(value) {
-  if (typeof value !== 'string' || value !== value.trim() || !/^https:\/\/[^/\s]+/.test(value)) return false;
-  try {
-    return new URL(value).protocol === 'https:';
-  } catch {
-    return false;
-  }
-}
-
-const codex = loadJson('.codex-plugin/plugin.json');
+const codex = loadJson('codex listing', '.codex-plugin/plugin.json');
 if (codex) {
   const iface = codex.interface && typeof codex.interface === 'object' ? codex.interface : null;
   if (!iface) fail('codex listing: interface object is required');
@@ -450,9 +561,9 @@ if (codex) {
     fail('codex listing: description is required and must be 1024 characters or fewer');
   }
   if (!codex.author || codex.author.name !== 'deriv') fail('codex listing: author.name must be deriv');
-  // Which file Codex reads instead is explained at step 3.
+  // The pinned ./.mcp.json value has no effect in this portable package; step 3 explains why.
   if (codex.mcpServers !== './.mcp.json') {
-    fail('codex listing: mcpServers must be ./.mcp.json (Codex reads the root mcp.json)');
+    fail('codex listing: mcpServers must be ./.mcp.json (the Codex compatibility field, which has no effect in a portable package where Codex reads the root mcp.json)');
   }
   if (codex.skills !== './skills/') fail('codex listing: skills must be ./skills/');
   for (const field of OPENAI_SCOPED_BANNED_KEYS) {
@@ -460,20 +571,12 @@ if (codex) {
       fail(`codex listing: ${field} must be omitted${field === 'apps' ? '; there is no .app.json' : ''}`);
     }
   }
-  const jsonHasKey = (node, key) => {
-    if (Array.isArray(node)) return node.some((item) => jsonHasKey(item, key));
-    if (node && typeof node === 'object') {
-      if (Object.prototype.hasOwnProperty.call(node, key)) return true;
-      return Object.values(node).some((value) => jsonHasKey(value, key));
-    }
-    return false;
-  };
   for (const field of OPENAI_RECURSIVE_BANNED_KEYS) {
-    if (jsonHasKey(codex, field)) {
+    if (jsonSome(codex, (text, isKey) => isKey && text === field)) {
       fail(`codex listing: ${field} must not appear`);
     }
   }
-  if (jsonHasAppReference(codex)) fail('codex listing: .app.json references must not appear');
+  if (jsonSome(codex, (text) => text.includes('.app.json'))) fail('codex listing: .app.json references must not appear');
 
   const openai = codex.extensions?.['com.openai'];
   if (!openai || typeof openai !== 'object' || Array.isArray(openai)) {
@@ -521,7 +624,7 @@ if (codex) {
         fail(`codex listing: review.test_cases.negative must be an array of length ${OPENAI_NEGATIVE_CASE_COUNT}`);
       } else {
         negative.forEach((c, i) => {
-          for (const field of ['description', 'prompt']) {
+          for (const field of ['description', 'prompt', 'expected_behavior']) {
             if (typeof c?.[field] !== 'string' || !c[field].trim()) {
               fail(`codex listing: negative[${i}].${field} must be a non-empty string`);
             }
@@ -576,17 +679,10 @@ if (codex) {
     }
     if ('screenshots' in iface) fail('codex listing: interface.screenshots must be absent');
   }
-  const cursor = loadJson('.cursor-plugin/plugin.json');
-  if (cursor && cursor.version !== codex.version) {
-    fail('codex listing: version must stay in lockstep with .cursor-plugin/plugin.json');
-  }
-  const rootPlugin = loadJson('plugin.json');
-  if (rootPlugin && rootPlugin.version !== codex.version) {
-    fail('codex listing: version must stay in lockstep with plugin.json');
-  }
+  checkVersionLockstep('codex listing', codex);
 }
 
-const marketplace = loadJson('.agents/plugins/marketplace.json');
+const marketplace = loadJson('codex listing', '.agents/plugins/marketplace.json');
 if (marketplace) {
   const entry = Array.isArray(marketplace.plugins) ? marketplace.plugins[0] : null;
   if (!entry) fail('codex listing: marketplace must declare one plugin entry');
@@ -610,22 +706,12 @@ if (marketplace) {
   }
 }
 
-const claudeMarketplace = loadJson('.claude-plugin/marketplace.json');
+const claudeMarketplace = loadJson('claude listing', '.claude-plugin/marketplace.json');
 if (claudeMarketplace) {
   const entry = Array.isArray(claudeMarketplace.plugins) ? claudeMarketplace.plugins[0] : null;
   if (!entry) fail('claude listing: marketplace must declare one plugin entry');
   else {
-    const claudePlugin = loadJson('.claude-plugin/plugin.json');
-    if (claudePlugin) {
-      const cursor = loadJson('.cursor-plugin/plugin.json');
-      if (cursor && cursor.version !== claudePlugin.version) {
-        fail('claude listing: version must stay in lockstep with .cursor-plugin/plugin.json');
-      }
-      const rootPlugin = loadJson('plugin.json');
-      if (rootPlugin && rootPlugin.version !== claudePlugin.version) {
-        fail('claude listing: version must stay in lockstep with plugin.json');
-      }
-    }
+    if (claudePlugin) checkVersionLockstep('claude listing', claudePlugin);
     const expectedRef = typeof claudePlugin?.version === 'string' ? `v${claudePlugin.version}` : null;
     const extra = pinSourceExtraKey(entry.source);
     const isUrlPin =
@@ -638,6 +724,17 @@ if (claudeMarketplace) {
       fail('claude listing: marketplace source must be the url pin at the lockstep version tag');
     }
   }
+}
+
+const kimiPlugin = hostDeclarations.get('kimi.plugin.json')?.file;
+if (kimiPlugin) checkVersionLockstep('kimi listing', kimiPlugin);
+
+const antigravityPlugin = loadJson('antigravity listing', '.antigravity-plugin/plugin.json');
+if (antigravityPlugin) {
+  if (antigravityPlugin.mcpServers !== undefined) {
+    fail('antigravity listing: mcpServers must not appear — it would silently override mcp_config.json');
+  }
+  checkVersionLockstep('antigravity listing', antigravityPlugin);
 }
 
 if (failures.length > 0) {
