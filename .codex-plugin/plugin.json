@@ -1,6 +1,6 @@
 {
   "name": "deriv",
-  "version": "1.0.10",
+  "version": "1.0.12",
   "description": "Live Deriv API schemas, payload validation, and guides for authentication, subscriptions, trades, and errors.",
   "author": {
     "name": "deriv",
@@ -84,9 +84,9 @@
           ],
           "negative": [
             {
-              "description": "Legacy API call: the current Deriv API has no authorize call, so the plugin must not invent a schema for it",
+              "description": "No reference entry: the Deriv API reference has no authorize endpoint or request schema, so the plugin must not invent one",
               "prompt": "Show me the request schema for the Deriv authorize call.",
-              "expected_behavior": "Reports that the live Deriv documentation has no authorize endpoint and does not invent a schema. It may point to the current OAuth authentication guidance instead."
+              "expected_behavior": "Reports that the Deriv API reference has no authorize endpoint or request schema and does not invent one. It may point to the current OAuth authentication guidance instead."
             },
             {
               "description": "Field that does not exist: the Deriv buy request has no max_leverage field, so the plugin must not describe one",

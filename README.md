@@ -1,9 +1,9 @@
 # Deriv API plugin
 
 A plugin that gives an AI coding agent Deriv API knowledge. Installing it as a
-native plugin for Cursor, Claude Code, and Codex adds the hosted MCP server plus
-bundled Agent Skills. Agents that only support the Agent Skills standard can
-install the skills separately.
+native plugin for Cursor, Claude Code, Codex, Antigravity, and Kimi adds the
+hosted MCP server plus bundled Agent Skills. Agents that
+only support the Agent Skills standard can install the skills separately.
 
 ## Install
 
@@ -50,12 +50,41 @@ If Codex shows an authentication step during install, that is Codex's
 generic MCP install flow — the plugin itself needs no Deriv sign-in
 and asks for no API token.
 
+### Antigravity
+
+```
+agy plugin install https://github.com/deriv-com/deriv-api-plugin
+```
+
+That installs the plugin straight from the public repository, with no local
+checkout. Google curates the Antigravity Marketplace, and the plugin
+can be put forward for it through Google's interest form at
+https://forms.gle/2EX5RFYPoJe1UgxR9.
+
+### Kimi
+
+In Kimi Code CLI, run:
+
+```
+/plugins install https://github.com/deriv-com/deriv-api-plugin
+```
+
+Kimi Work imports the same repository. Listing on Kimi's official marketplace
+is requested from Kimi Work, on the plugin detail page, through
+"Apply for official marketplace publication".
+
 ### Verify it works
 
 In Claude Code, run `/mcp` and confirm `deriv` shows as connected, with its
-tools listed. In Cursor, open the MCP settings and confirm the same. If the
-hosted endpoint is unreachable, the bundled skills still load; follow those
-instead of inventing field lists. Do not invent field lists in either case.
+tools listed. In Cursor, open the MCP settings and confirm the same. In
+Antigravity, check that `deriv` is listed as installed and enabled, together
+with its `deriv` MCP server, in the App's Customizations > Installed tab or
+under `/plugin` > Installed in the `agy` CLI. In Kimi Code CLI, run `/reload`
+after installing (plugin MCP servers start after `/reload` or in a new
+session), then run `/plugins` and check that `deriv` and its `deriv` MCP server
+are enabled. If the hosted endpoint is unreachable,
+the bundled skills still load; follow those instead of inventing field lists.
+Do not invent field lists in either case.
 
 ## Skills only
 
@@ -102,16 +131,19 @@ If the plugin is already installed on that host, do not also copy skills or run
 | --- | --- | --- |
 | `deriv` | `https://mcp-api-v2.deriv.com/mcp` | Live schemas, field facts, payload validation, and task guides |
 
-The server is declared twice at the plugin root, for the same key at the same
-URL: `.mcp.json` (`type: "http"`) is what Cursor and Claude Code read, and
-`mcp.json` (`type: "streamable-http"`, under the Agent Plugins v1 schema) is
-what a host following that standard reads. Codex reads the root `mcp.json`.
-The Codex compatibility manifest's `mcpServers` field names `./.mcp.json`, but
-this is a portable package, and under
-[OpenAI's package rules](https://developers.openai.com/plugins/deploy/submission) a portable
-package's root `mcp.json` is what OpenAI and Codex discover; that field cannot
-replace it. That matches what we measured on 2026-10-01 with Codex CLI 0.159.2.
-Both files name the same server at the same URL.
+The server is declared twice at the plugin root: `.mcp.json` (`type: "http"`)
+is what Cursor and Claude Code read, and `mcp.json` (`type: "streamable-http"`,
+under the Agent Plugins v1 schema) is what a host following that standard
+reads. Codex reads the root `mcp.json`. The Codex compatibility manifest's
+`mcpServers` field names `./.mcp.json`, but this is a portable package, and
+under [OpenAI's package rules](https://developers.openai.com/plugins/deploy/submission)
+a portable package's root `mcp.json` is what OpenAI discovers; that field
+cannot replace it. That matches what we measured on 2026-10-01 with Codex CLI
+0.159.2. Both files name the same server at the same URL.
+
+Two more hosts read their own files, which point at that same `deriv` server:
+Antigravity reads `mcp_config.json`, and Kimi reads the `mcpServers` entry in
+`kimi.plugin.json`.
 
 ## Usage
 
