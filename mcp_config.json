@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "deriv": {
+      "serverUrl": "https://mcp-api-v2.deriv.com/mcp"
+    }
+  }
+}
