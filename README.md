@@ -157,6 +157,24 @@ server, so keep API tokens and other secrets out of tool-call arguments.
 When you build an integration that itself calls the Deriv API, your own
 application supplies its own credentials.
 
+## Privacy
+
+The [Deriv Privacy Policy](https://deriv.com/privacy-policy) applies to
+personal data processed through the plugin. See [`PRIVACY.md`](PRIVACY.md) for
+what the plugin and the hosted server process.
+
+For privacy questions or requests, contact Deriv's Data Protection Officer at
+[dpo@deriv.com](mailto:dpo@deriv.com).
+
+## Support
+
+- Questions and bug reports:
+  [GitHub issues](https://github.com/deriv-com/deriv-api-plugin/issues).
+- Email: [api-support@deriv.com](mailto:api-support@deriv.com).
+
+Report a suspected vulnerability privately, as [`SECURITY.md`](SECURITY.md)
+describes, not in a public issue.
+
 ## Where to go next
 
 - [`CONTRIBUTING.md`](CONTRIBUTING.md) — how to file issues and open pull requests.
