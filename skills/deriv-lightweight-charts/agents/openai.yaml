@@ -8,4 +8,4 @@ dependencies:
       value: "deriv"
       description: "Live Deriv tick-history, subscription, and trading-times schemas the chart feed must follow"
       transport: "streamable_http"
-      url: "https://mcp-api-v2.deriv.com/mcp"
+      url: "https://mcp-api.deriv.com/mcp"

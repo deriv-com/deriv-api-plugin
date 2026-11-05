@@ -72,5 +72,4 @@ opening a public issue. Include enough detail to reproduce the problem and,
 where relevant, the potential impact. The team will acknowledge the report
 and follow up on a fix.
 
-> Note: `mcp-api.deriv.com` is a separate Deriv MCP operated by a different team
-> and is not the server this plugin points at.
+> Note: `mcp-api.deriv.com` is the hosted Deriv API MCP server this plugin points at.

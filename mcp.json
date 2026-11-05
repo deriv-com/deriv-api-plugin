@@ -3,7 +3,7 @@
   "mcpServers": {
     "deriv": {
       "type": "streamable-http",
-      "url": "https://mcp-api-v2.deriv.com/mcp"
+      "url": "https://mcp-api.deriv.com/mcp"
     }
   }
 }

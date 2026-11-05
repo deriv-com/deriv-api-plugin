@@ -129,7 +129,7 @@ If the plugin is already installed on that host, do not also copy skills or run
 
 | Server key | URL | Purpose |
 | --- | --- | --- |
-| `deriv` | `https://mcp-api-v2.deriv.com/mcp` | Live schemas, field facts, payload validation, and task guides |
+| `deriv` | `https://mcp-api.deriv.com/mcp` | Live schemas, field facts, payload validation, and task guides |
 
 The server is declared twice at the plugin root: `.mcp.json` (`type: "http"`)
 is what Cursor and Claude Code read, and `mcp.json` (`type: "streamable-http"`,

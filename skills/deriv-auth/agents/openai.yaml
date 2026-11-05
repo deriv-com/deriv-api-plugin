@@ -8,4 +8,4 @@ dependencies:
       value: "deriv"
       description: "Live Deriv authentication guides and endpoint schemas"
       transport: "streamable_http"
-      url: "https://mcp-api-v2.deriv.com/mcp"
+      url: "https://mcp-api.deriv.com/mcp"

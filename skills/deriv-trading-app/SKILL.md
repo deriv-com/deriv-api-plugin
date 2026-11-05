@@ -45,7 +45,7 @@ Resolve the target repository/template and its architecture before editing appli
 
 Read and enforce the [New API-only guard](references/new-api-only.md) before using any API fact or repository example. Existing endpoint names, code, and schemas do not prove that their fields use the New API.
 
-Use the configured Deriv API MCP at `https://mcp-api-v2.deriv.com/mcp`. The MCP is a read-only development aid; generated applications call Deriv APIs directly and must not depend on the MCP at runtime.
+Use the configured Deriv API MCP at `https://mcp-api.deriv.com/mcp`. The MCP is a read-only development aid; generated applications call Deriv APIs directly and must not depend on the MCP at runtime.
 
 First inspect the client's MCP tool list for the configured `deriv` server. A URL written in a prompt is not a connected tool: if the server is absent, configure it through the client's MCP settings and confirm the service is reachable, or use the fallback below. Do not make raw JSON-RPC calls from generated application code.
 
