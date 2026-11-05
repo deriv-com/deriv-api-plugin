@@ -1,6 +1,6 @@
 {
   "name": "deriv",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "description": "Live Deriv API schemas, payload validation, and guides for authentication, subscriptions, trades, and errors.",
   "keywords": ["deriv", "trading", "api", "websocket", "rest", "options", "finance", "fintech"],
   "author": { "name": "Deriv", "email": "api-support@deriv.com" },

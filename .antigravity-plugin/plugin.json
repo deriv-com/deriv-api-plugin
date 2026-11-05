@@ -3,7 +3,7 @@
   "name": "deriv",
   "displayName": "Deriv",
   "description": "Live Deriv API schemas, payload validation, and guides for authentication, subscriptions, trades, and errors.",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "logo": "./assets/logo.png",
   "suggestedPrompts": [
     "Look up the live schema for a Deriv API endpoint",
