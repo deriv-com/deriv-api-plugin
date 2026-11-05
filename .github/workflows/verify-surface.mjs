@@ -16,7 +16,7 @@
 //      (.mcp.json and mcp.json), the Antigravity and Kimi declarations
 //      (mcp_config.json and kimi.plugin.json), and the Antigravity manifest
 //      must exist (independent of ALLOW).
-//   3. MCP URL pin: mcpServers.deriv must sit at https://mcp-api-v2.deriv.com/mcp
+//   3. MCP URL pin: mcpServers.deriv must sit at https://mcp-api.deriv.com/mcp
 //      in both files — type "http" in the vendor-dialect .mcp.json, and
 //      type "streamable-http" under the Agent Plugins v1 $schema in mcp.json.
 //      The two transport spellings are pinned separately, never compared. The
@@ -274,7 +274,7 @@ function loadJson(label, path) {
   }
 }
 
-const PRODUCTION_MCP_URL = 'https://mcp-api-v2.deriv.com/mcp';
+const PRODUCTION_MCP_URL = 'https://mcp-api.deriv.com/mcp';
 const STANDARD_MCP_SCHEMA_URL = 'https://agent-plugins.org/schemas/1.0.0/mcp.schema.json';
 // 3. MCP URL pin, over the declaration pair. The two files differ only in
 //    schema and transport spelling: the vendor dialect Claude Code and Cursor
