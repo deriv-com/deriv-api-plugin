@@ -87,6 +87,15 @@ jobs:
         with:
           token: ${{ steps.app-token.outputs.token }}
 
+      # Pin the Node that runs verify-surface.mjs and update-changelog.mjs below
+      # instead of using the runner image's default. verify-surface.yml carries
+      # the same pin, but automated promotion does not copy that file, so it
+      # reaches public in a manual promotion PR or a separate reviewed checker
+      # change.
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '24.22.3'
+
       # 3. Download the release asset from the source repo, then VALIDATE its
       #    format and content BEFORE unpacking (reject an oversized or
       #    traversal-bearing archive).
